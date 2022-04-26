@@ -1,12 +1,12 @@
 import React from 'react';
 
-function Home() {
+function SearchPage() {
   return(
     <div>
       <h1 className="mt-5">WHYMDb</h1>
       <p>Begin Searching For Movies By Using the Fields Below:</p>
       <form method="POST" action="/searchSubmitted">
-        <table className="mt-3" style={{ marginLeft: "auto", marginRight: "auto", width: "50%" }}>
+        <table className="mt-3" style={{ marginLeft: "auto", marginRight: "auto", width: "45%" }}>
           <tbody>
             <tr>
               <td>
@@ -53,17 +53,17 @@ function Home() {
                 <label>Release Date:</label>
               </td>
               <td>
-                <input type="date" defaultValue={""} name="releaseDate" className="form-control" style={{ width: "auto" }}/>
+                <input type="date" name="releaseDate" className="form-control" style={{ width: "auto" }}/>
               </td>
             </tr>
           </tbody>
         </table>
         <div>
-          <input type="submit" value="Search" className="btn btn-primary mb-2" />
+          <input type="submit" value="Search" className="btn btn-primary mb-2" style={{ marginTop: "5px" }} />
         </div>
       </form>
     </div>
   );
 }
 
-export default Home;
+export default SearchPage;

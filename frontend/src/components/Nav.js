@@ -11,7 +11,7 @@ function Nav() {
       </button>
       <div id="navMainMenu" className="navbar-collapse collapse">
         <div className="navbar-nav ml-auto">
-          <Link to='/' className="nav-item nav-link active">Home</Link>
+          <Link to='/' className="nav-item nav-link">Search</Link>
           <Link to='/account' className="nav-item nav-link">Account</Link>
         </div>
       </div>

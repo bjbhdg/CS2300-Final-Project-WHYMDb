@@ -84,15 +84,41 @@ router.get('/account', async (req, res) => {
 pool.getConnection( (err, conn) => {
   if (err) console.log(err);
 
-    conn.query(CREATE_USER_LOGGED_IN, (err, result) => {
-      if (err) console.log(err);
-      console.log("Log-In Set Up.");
-    });
+  conn.query(CREATE_USER_LOGGED_IN, (err, result) => {
+    if (err) console.log(err);
+    console.log("Log-In Set Up.");
+  });
 
     try {
-      const qry = `SELECT Logged_In_Username FROM User_Logged_In`;
+      const qry = `SELECT * FROM User_Logged_In`;
       conn.query(qry, (err, result) => {
-        conn.release();
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+      });
+      //const userRatingQry = `SELECT * FROM Rating WHERE Users_Username = (SELECT Logged_In_Username FROM User_Logged_IN)`;
+      //conn.query(userRatingQry, (err, conn) => {
+      //  if (err) console.log(err);
+      //  res.send(JSON.stringify(result));
+      //});
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getUserRatings', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    try {
+      const obtainLoggedInUserRatings = `
+        SELECT (Select Title FROM Movie WHERE Movie_ID = R.Movie_ID) as Rated_Movie,
+          R.Score, R.Date_Last_Updated, R.Title, R.Rating_Description
+        FROM Rating AS R, User_Logged_In AS U
+        WHERE R.Users_Username = U.Logged_In_Username
+      `;
+      conn.query(obtainLoggedInUserRatings, (err, result) => {
         if (err) console.log(err);
         res.send(JSON.stringify(result));
       });
