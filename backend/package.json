@@ -8,11 +8,10 @@
     "client": "npm run start --prefix ../frontend",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
-  "keywords": [],
-  "author": "",
+  "author": "WHYMDb Group",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.15"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

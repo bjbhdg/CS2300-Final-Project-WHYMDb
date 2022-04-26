@@ -2,47 +2,73 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db.js');
 
-// Doesn't work, but should search the database for movies and return a movie matching
-// the passed in parameters.
-router.get('/movieSearch', async (req, res) => {
-    const movieTitle = req.body.movieTitleInput;
-    const releaseDate = req.body.movieReleaseDateInput;
-    pool.getConnection( (err, conn) => {
-        if (err) throw err;
+// This query will be used to reset the search table in our database schema imported from `whymdb_sql_database.sql`.
+const RESET_SEARCH = `DROP TABLE IF EXISTS Search_Results`
 
-        try {
-            const qry = 'SELECT * FROM Movie WHERE Title=? AND Release_Date=?';
-            conn.query(qry, [movieTitle, releaseDate], (err, result) => {
-                conn.release();
-                if(err) throw err;
-                res.send(JSON.stringify(result));
-            });
-        } catch (err) {
-            console.log(err);
-            res.end();
-        };
-   });
+// Creates a table to store movie titles that match up with the passed in search fields.
+const CREATE_SEARCH = `
+  CREATE TABLE Search_Results (
+    Search_ID INT NOT NULL AUTO_INCREMENT,
+    Searched_Movie_Title VARCHAR(200) NOT NULL,
+    PRIMARY KEY(Search_ID)
+  )`;
+
+// When on the 'search' page (URL: localhost:3000/search), the page will retrieve the matching movies that the
+// "POST" function below added into the "Search_Results" table.
+router.get('/search', async (req, res) => {
+  // Establish connection to the MySQL database.
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    try {
+      // Query the database for the movie titles of the searched movie results.
+      const qry = `SELECT Searched_Movie_Title FROM Search_Results`
+      conn.query(qry, (err, result) => {
+        if (err) console.log(err)
+        // Send that data to SearchResults.js page for further processing.
+        res.send(JSON.stringify(result));
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
 });
 
-/*
-router.post('/searchMovie', async (req, res) => {
-    const movieTitle = req.body.movieTitleInput;
-    const releaseDate = req.body.movieReleaseDateInput;
-    pool.getConnection( (err, conn) => {
-        if (err) throw err;
+// When pressing 'Search' on the homepage of the app, express will route the data submitted via the HTML
+// form to here.
+router.post('/searchSubmitted', async (req, res) => {
+  // Houses user-entered data from the HTML form data of "Home.js".
+  const movieTitle = req.body.title;
+  const releaseDate = (req.body.releaseDate ? req.body.releaseDate : null);
 
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
 
+    // Resets search table using the RESET_SEARCH query instantiated at the top of "handler.js".
+    conn.query(RESET_SEARCH, (err, result) => {
+      if (err) console.log("Failed to Reset Search.");
+      console.log(result);
+    });
 
-        const qry = 'SELECT * FROM Movie WHERE Title=? OR Release_Date=?';
-        conn.query(qry, [movieTitle, releaseDate], (err, result) => {
-            conn.release();
-            if (err) throw err;
-            console.log("Movie Searched!");
-        });
-        res.redirect('/searchMovie');
-        res.end();
-    })
+    // Recreates search table to insert search results in.
+    conn.query(CREATE_SEARCH, (err, result) => {
+      if (err) console.log("Search Init Failed.");
+      console.log(result);
+    });
+
+    // qry will insert any movie titles that match with the entered in filters.
+    const qry = `INSERT INTO Search_Results(Searched_Movie_Title) (SELECT Title FROM Movie WHERE Title=? OR Release_Date=?)`;
+
+    conn.query(qry, [movieTitle, releaseDate], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+        console.log('Search Processed Successfully.');
+      });
+
+      // After this route is over, redirect the user to the "/search" page to view their search's results.
+      res.redirect('/search');
+      res.end();
+    });
 });
-*/
 
 module.exports = router;
