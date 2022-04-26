@@ -41,7 +41,7 @@ CREATE TABLE Theater_Operating_Hours (
     Opening_Time TIME NOT NULL,
     Closing_Time TIME NOT NULL,
     
-    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location)
+    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location) ON DELETE CASCADE
 );
 
 CREATE TABLE Movie (
@@ -56,15 +56,15 @@ CREATE TABLE Movie_Genres (
 	Movie_ID INT NOT NULL,
     Genre VARCHAR(50) NOT NULL,
     
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID)
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE SHOWING_IN (
 	Theater_Location VARCHAR(300) NOT NULL,
     Movie_ID INT NOT NULL,
     
-    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location),
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID)
+    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location) ON DELETE CASCADE,
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE Film_Workers (
@@ -79,21 +79,22 @@ CREATE TABLE Film_Workers (
 CREATE TABLE Actor_Actress (
 	ID INT NOT NULL,
     
-    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID)
+    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE Director (
 	ID INT NOT NULL,
     
-    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID)
+    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE WORKED_ON (
 	Movie_ID INT NOT NULL,
     Film_Worker_ID INT NOT NULL,
     
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID),
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE,
     FOREIGN KEY(Film_Worker_ID) REFERENCES Film_Workers(Film_Worker_ID)
+		ON DELETE CASCADE
 );
 
 CREATE TABLE Studio (
@@ -111,7 +112,7 @@ CREATE TABLE PRODUCED_BY (
 );
 
 CREATE TABLE DB_User (
-	Username VARCHAR(20) UNIQUE,
+	Username VARCHAR(20) NOT NULL UNIQUE,
     User_Password VARCHAR(25) NOT NULL CHECK(
 		LENGTH(User_Password) >= 8 AND
         LENGTH(User_Password) <= 25
@@ -123,7 +124,7 @@ CREATE TABLE DB_User (
 CREATE TABLE Moderator (
 	Mod_Username VARCHAR(20),
     
-    FOREIGN KEY(Mod_Username) REFERENCES DB_User(Username)
+    FOREIGN KEY(Mod_Username) REFERENCES DB_User(Username) ON DELETE CASCADE
 );
 
 CREATE TABLE Rating (
@@ -135,8 +136,8 @@ CREATE TABLE Rating (
 	Title VARCHAR(50),
     Rating_Description VARCHAR(500),
     
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID),
-    FOREIGN KEY(Users_Username) REFERENCES DB_User(Username)
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE,
+    FOREIGN KEY(Users_Username) REFERENCES DB_User(Username) ON DELETE CASCADE
 );
 
 -- Sample data to be inserted into each table of the schema.

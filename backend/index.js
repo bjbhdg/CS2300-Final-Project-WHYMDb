@@ -8,7 +8,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/', routesHandler);
 
-/*
 if (process.env.NODE_ENV === 'production') {
   // Serve any static files
   app.use(express.static(path.join(__dirname, 'frontend/build')));
@@ -18,9 +17,8 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, 'frontend/build', routesHandler));
   });
 }
-*/
 
-const PORT = process.env.PORT || 4000; // backend routing port
+const PORT = 4000; // backend routing port
 app.listen(PORT, (err) => {
   if (err) console.log(err);
   console.log(`Server is running on port ${PORT}.`);

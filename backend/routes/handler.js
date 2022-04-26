@@ -13,12 +13,13 @@ const CREATE_SEARCH = `
     PRIMARY KEY(Search_ID)
   )`;
 
-const RESET_USER = `DROP TABLE IF EXISTS User_Logged_In`
+const RESET_USER = `DROP TABLE IF EXISTS User_Logged_In`;
+
 const CREATE_USER_LOGGED_IN = `
   CREATE TABLE IF NOT EXISTS User_Logged_In (
     Logged_In_Username VARCHAR(20) NOT NULL,
     Is_Moderator BOOLEAN,
-    PRIMARY KEY(Logged_In_Username)
+    FOREIGN KEY(Logged_In_Username) REFERENCES DB_User(Username) ON DELETE CASCADE
 )`;
 
 // When on the 'search' page (URL: localhost:3000/search), the page will retrieve the matching movies that the
@@ -95,11 +96,6 @@ pool.getConnection( (err, conn) => {
         if (err) console.log(err);
         res.send(JSON.stringify(result));
       });
-      //const userRatingQry = `SELECT * FROM Rating WHERE Users_Username = (SELECT Logged_In_Username FROM User_Logged_IN)`;
-      //conn.query(userRatingQry, (err, conn) => {
-      //  if (err) console.log(err);
-      //  res.send(JSON.stringify(result));
-      //});
     } catch (err) {
       console.log(err);
       res.end();
@@ -136,20 +132,44 @@ router.post('/login', async (req, res) => {
   pool.getConnection( (err, conn) => {
     if (err) console.log(err);
 
-    const qry1 = `INSERT INTO User_Logged_In(Logged_In_Username) (SELECT Username FROM DB_User WHERE Username=? AND User_Password=?)`;
-    const qry2 = `UPDATE User_Logged_In
+    const usrnameOfLoggedInUser = `
+      INSERT INTO User_Logged_In(Logged_In_Username) (SELECT Username FROM DB_User WHERE Username=? AND User_Password=?)
+    `;
+    const isLoggedInUserMod = `
+      UPDATE User_Logged_In
       SET Is_Moderator = (SELECT (A.Username = B.Mod_Username) FROM DB_User AS A, Moderator AS B WHERE A.Username=?)
       WHERE Logged_In_Username=?
     `;
 
-    conn.query(qry1, [username, password], (err, result) => {
+    conn.query(usrnameOfLoggedInUser, [username, password], (err, result) => {
+      if (err) console.log(err);
+      else console.log("Account Info Entered.");
+    });
+    
+    conn.query(isLoggedInUserMod, [username, username], (err, result) => {
       conn.release();
       if (err) console.log(err);
-      console.log("Account Info Entered.");
+      else console.log("Moderator Status Obtained.");
     });
-    conn.query(qry2, [username, username], (err, result) => {
+
+    res.redirect('/account');
+    res.end();
+  });
+});
+
+router.post('/createAccount', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const newUsername = req.body.newUser;
+    const newPassword = req.body.newPass;
+
+    const newUser =  `INSERT INTO DB_User VALUES(?, ?)`
+
+    conn.query(newUser, [newUsername, newPassword], (err, result) => {
+      conn.release();
       if (err) console.log(err);
-      console.log("Moderator Status Obtained.");
+      else console.log("Successfully added user!");
     });
 
     res.redirect('/account');
@@ -169,6 +189,21 @@ router.post('/logout', async (req, res) => {
     res.redirect('/');
     res.end();
   });
+});
+
+router.post('/deleteAccount', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const deleteUser = `DELETE FROM DB_User WHERE Username = (SELECT Logged_In_Username FROM User_Logged_In)`;
+    conn.query(deleteUser, (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      console.log("User successfully deleted.")
+    });
+  });
+  
+  res.redirect('/account');
+  res.end();
 });
 
 module.exports = router;
