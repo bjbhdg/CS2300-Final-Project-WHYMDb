@@ -182,10 +182,12 @@ INSERT INTO Produced_By VALUES
 (1, "DreamWorks");
 
 INSERT INTO DB_User VALUES
-("The Man", "1234573823"),
+("The Man", "123456789"),
 ("A Man", "jdsfjo23j2"),
 ("Me", "jsdfwefqkmef2"),
 ("That One Guy", "kikikekekpw");
+
+INSERT INTO Moderator VALUES ("The Man");
 
 INSERT INTO Rating(Movie_ID,
 	Users_Username, Score, Title, Rating_Description)

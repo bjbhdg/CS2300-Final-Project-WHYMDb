@@ -1,29 +1,28 @@
 import React, {useEffect, useState} from 'react';
-// import {Link} from 'react-router-dom';
 
 function SearchResults() {
   useEffect( () => {
-    fetchItems();
+    fetchMovies();
   }, []);
 
-  const [items, setItems] = useState([]);
+  const [movies, setMovies] = useState([]);
 
   // Grabs the matching movie titles of the search filters filled out in the "Home" page from "handler.js".
-  const fetchItems = async () => {
+  const fetchMovies = async () => {
     const data = await fetch('/search');
-    const items = await data.json();
-    setItems(items);
+    const searchedMovies = await data.json();
+    setMovies(searchedMovies);
   };
 
   return(    
     <div className="container-fluid">
       <h1 className="mt-5">WHYMDb</h1>
       <h2 className="mt-3">Search Results</h2>
-      { items.length
-        ? items.map(item => (
+      { movies.length
+        ? movies.map(movie => (
           <div className="row padding">
             <div>
-              {item.Searched_Movie_Title}
+              {movie.Searched_Movie_Title}
             </div>
           </div>       
         ))

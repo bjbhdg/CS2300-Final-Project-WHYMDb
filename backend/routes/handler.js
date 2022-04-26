@@ -13,6 +13,14 @@ const CREATE_SEARCH = `
     PRIMARY KEY(Search_ID)
   )`;
 
+const RESET_USER = `DROP TABLE IF EXISTS User_Logged_In`
+const CREATE_USER_LOGGED_IN = `
+  CREATE TABLE IF NOT EXISTS User_Logged_In (
+    Logged_In_Username VARCHAR(20) NOT NULL,
+    Is_Moderator BOOLEAN,
+    PRIMARY KEY(Logged_In_Username)
+)`;
+
 // When on the 'search' page (URL: localhost:3000/search), the page will retrieve the matching movies that the
 // "POST" function below added into the "Search_Results" table.
 router.get('/search', async (req, res) => {
@@ -62,13 +70,79 @@ router.post('/searchSubmitted', async (req, res) => {
     conn.query(qry, [movieTitle, releaseDate], (err, result) => {
       conn.release();
       if (err) console.log(err);
-        console.log('Search Processed Successfully.');
-      });
-
-      // After this route is over, redirect the user to the "/search" page to view their search's results.
-      res.redirect('/search');
-      res.end();
+      console.log('Search Processed Successfully.');
     });
+
+    // After this route is over, redirect the user to the "/search" page to view their search's results.
+    res.redirect('/search');
+    res.end();
+  });
+});
+
+router.get('/account', async (req, res) => {
+// Establish connection to the MySQL database.
+pool.getConnection( (err, conn) => {
+  if (err) console.log(err);
+
+    conn.query(CREATE_USER_LOGGED_IN, (err, result) => {
+      if (err) console.log(err);
+      console.log("Log-In Set Up.");
+    });
+
+    try {
+      const qry = `SELECT Logged_In_Username FROM User_Logged_In`;
+      conn.query(qry, (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.post('/login', async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.pass;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const qry1 = `INSERT INTO User_Logged_In(Logged_In_Username) (SELECT Username FROM DB_User WHERE Username=? AND User_Password=?)`;
+    const qry2 = `UPDATE User_Logged_In
+      SET Is_Moderator = (SELECT (A.Username = B.Mod_Username) FROM DB_User AS A, Moderator AS B WHERE A.Username=?)
+      WHERE Logged_In_Username=?
+    `;
+
+    conn.query(qry1, [username, password], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      console.log("Account Info Entered.");
+    });
+    conn.query(qry2, [username, username], (err, result) => {
+      if (err) console.log(err);
+      console.log("Moderator Status Obtained.");
+    });
+
+    res.redirect('/account');
+    res.end();
+  });
+});
+
+router.post('/logout', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    conn.query(RESET_USER, (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      console.log("Successfully logged out.");
+    });
+
+    res.redirect('/');
+    res.end();
+  });
 });
 
 module.exports = router;
