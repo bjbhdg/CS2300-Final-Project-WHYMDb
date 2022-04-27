@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function SearchPage() {
+
+  // These are used to give visual feedback on the value of each slider for the rating search.
+  const [minRatingValue, setMinRatingValue] = useState([]);
+  const [maxRatingValue, setMaxRatingValue] = useState([]);
+
   return(
     <div>
       <h1 className="mt-5">WHYMDb</h1>
@@ -91,19 +96,20 @@ function SearchPage() {
                 <label>Rating:</label>
               </td>
               <td>
-                <label style={{ width: "auto" }}>Min Score:</label>
-                <input type="number" defaultValue={0} name="minScore" className="form-control" style={{ width: "auto" }} />
+                <label style={{ width: "auto" }}>Min Score: {minRatingValue}</label>
+                <input id="minScore" name="minScore" type="range" min={0} max={10} step={0.1} defaultValue={0} className="form-control"
+                  onChange={() => setMinRatingValue(document.getElementById("minScore").value)} style={{ width: "auto" }}
+                />
               </td>
               <td>
-                <label style={{ width: "auto" }}>Max Score:</label>
-                <input type="number" defaultValue={0} name="maxScore" className="form-control" style={{ width: "auto" }} />
+                <label style={{ width: "auto" }}>Max Score: {maxRatingValue}</label>
+                <input id="maxScore" name="maxScore" type="range" min={0} max={10} step={0.1} defaultValue={0} className="form-control"
+                  onChange={() => setMaxRatingValue(document.getElementById("maxScore").value)} style={{ width: "auto" }}
+                />
               </td>
             </tr>
           </tbody>
         </table>
-        <div>
-          
-        </div>
         <div>
           <input type="submit" value="Search" className="btn btn-primary mb-2" style={{ marginTop: "5px" }} />
         </div>

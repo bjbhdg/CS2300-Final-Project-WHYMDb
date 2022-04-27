@@ -53,7 +53,7 @@ function Account() {
                   </tr>
                 </tbody>
               </table>
-              <input type="submit" value="Log In" className="btn btn-primary mb-2" /> 
+              <input type="submit" value="Log In" className="btn btn-primary mb-2" style={{ marginTop: "5px" }} /> 
             </form>
 
             <p className='mt-1'>If You Do Not Have An Account, Then You Can Create One Below.</p>
@@ -82,7 +82,7 @@ function Account() {
                   </tr>
                 </tbody>
               </table>
-              <input type="submit" value="Create Account" className="btn btn-primary mb-2" /> 
+              <input type="submit" value="Create Account" className="btn btn-primary mb-2" style={{ marginTop: "5px" }} /> 
             </form>
           </div>
 
