@@ -154,33 +154,45 @@ INSERT INTO Theater_Operating_Hours VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "Su", "10:30:00", "01:15:00");
 
 INSERT INTO Movie(title, release_date) VALUES
-("The Bad Guys", "2022-04-22");
+("The Bad Guys", "2022-04-22"),
+("Sonic the Hedgehog 2", "2022-04-08");
 
 INSERT INTO Movie_Genres VALUES
 (1, "Action"),
-(1, "Comedy");
+(1, "Comedy"),
+(2, "Action"),
+(2, "Adventure");
 
 INSERT INTO SHOWING_IN VALUES
-("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 1);
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 1),
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 2);
 
 INSERT INTO Film_Workers(First_Name, Last_Name) VALUES
 ("Pierre", "Perifel"),
 ("Sam", "Rockwell"),
 ("Anthony", "Ramos"),
-("Marc", "Maron");
+("Marc", "Maron"),
 
-INSERT INTO Actor_Actress VALUES(2), (3), (4);
+("Jeff", "Fowler"),
+("James", "Marsden"),
+("Jim", "Carrey"),
+("Ben", "Schwartz");
 
-INSERT INTO Director VALUES(1);
+INSERT INTO Actor_Actress VALUES(2), (3), (4), (6), (7), (8);
+
+INSERT INTO Director VALUES(1), (5);
 
 INSERT INTO Worked_On VALUES
-(1, 1), (1, 2), (1, 3), (1, 4);
+(1, 1), (1, 2), (1, 3), (1, 4),
+(2, 5), (2, 6), (2, 7), (2, 8);
 
 INSERT INTO Studio VALUES
-("DreamWorks");
+("DreamWorks"),
+("Paramount Pictures");
 
 INSERT INTO Produced_By VALUES
-(1, "DreamWorks");
+(1, "DreamWorks"),
+(2, "Paramount Pictures");
 
 INSERT INTO DB_User VALUES
 ("The Man", "123456789"),
@@ -196,4 +208,5 @@ VALUES
 (1, "The Man", 10, "Pretty Good", NULL),
 (1, "A Man", 10, ":)", ":)"),
 (1, "Me", 10, "Haven't Seen It", "no comment"),
-(1, "That One Guy", 0, "Bad", "I'm that one guy!");
+(1, "That One Guy", 0, "Bad", "I'm that one guy!"),
+(2, "The Man", 8, "SONIIICC YEAHH!!!", "WOOOOOOOOOOH");

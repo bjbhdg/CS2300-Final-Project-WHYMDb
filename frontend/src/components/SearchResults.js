@@ -20,7 +20,7 @@ function SearchResults() {
       <h2 className="mt-3">Search Results</h2>
       { movies.length
         ? movies.map(movie => (
-          <div className="row padding">
+          <div id={movie.Search_ID} className="row padding">
             <div>
               {movie.Searched_Movie_Title}
             </div>
