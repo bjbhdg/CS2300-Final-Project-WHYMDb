@@ -29,7 +29,8 @@ router.get('/search', async (req, res) => {
 router.post('/searchSubmitted', async (req, res) => {
   // Houses user-entered data from the HTML form data of "SearchPage.js".
   const movieTitle = req.body.title;
-  const releaseDate = (req.body.releaseDate ? req.body.releaseDate : null);
+  const dateRangeStart = (req.body.releaseDateStart ? req.body.releaseDateStart : null);
+  const dateRangeEnd = (req.body.releaseDateEnd ? req.body.releaseDateEnd : null);
   const aFirstName = req.body.actorFirstName;
   const aLastName = req.body.actorLastName;
   const dFirstName = req.body.directorFirstName;
@@ -72,7 +73,9 @@ router.post('/searchSubmitted', async (req, res) => {
 
       FROM Movie AS M
 
-      WHERE (M.Title = ? OR M.Release_Date = ?)
+      WHERE M.Title = ?
+
+        OR M.Release_Date BETWEEN ? AND ?
 
         OR M.Movie_ID = ANY (
           SELECT W.Movie_ID
@@ -112,7 +115,9 @@ router.post('/searchSubmitted', async (req, res) => {
     `;
 
     conn.query(searchForMovies,
-        [movieTitle, releaseDate, aFirstName, aLastName, dFirstName, dLastName, stuName, theatLoc, minRate, maxRate, [genres]],
+        [movieTitle, dateRangeStart, dateRangeEnd, aFirstName, aLastName,
+          dFirstName, dLastName, stuName, theatLoc, minRate, maxRate, [genres]
+        ],
           (err, result) => {
       conn.release();
       if (err) console.log(err);

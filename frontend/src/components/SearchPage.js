@@ -11,7 +11,9 @@ function SearchPage() {
       <h1 className="mt-5">WHYMDb</h1>
       <p>Begin Searching For Movies By Using the Fields Below:</p>
       <form method="POST" action="/searchSubmitted">
-        <table className="mt-3" style={{ textAlign: "left", tableLayout: "fixed", marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+        <table className="mt-3"
+          style={{ textAlign: "left", tableLayout: "fixed", marginLeft: "auto", marginRight: "auto", width: "auto" }}
+        >
           <tbody>
             <tr>
               <td>
@@ -78,17 +80,22 @@ function SearchPage() {
                 <label>Genres:</label>
               </td>
               <td>
-                <input type="text" name="genreList" placeholder="Genres"
+                <input type="text" name="genreList" placeholder="Genres (genre1, genre2, ...)"
                   className="form-control" style={{ width: "auto" }}
                 />
               </td>
             </tr> 
             <tr>
               <td>
-                <label>Release Date:</label>
+                <label>Release Date Range:</label>
               </td>
               <td>
-                <input type="date" name="releaseDate" className="form-control" />
+                <label style={{ width: "auto" }}>Start Date:</label>
+                <input type="date" name="releaseDateStart" className="form-control" />
+              </td>
+              <td>
+                <label style={{ width: "auto" }}>End Date:</label>
+                <input type="date" name="releaseDateEnd" className="form-control" />
               </td>
             </tr>
             <tr>
