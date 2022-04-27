@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
 
 function SearchResults() {
   useEffect( () => {
@@ -16,11 +17,14 @@ function SearchResults() {
 
   return(    
     <div className="container-fluid">
+
+      <Link style={{ marginTop: "5px" }} className="btn btn-primary mb-2" to='/'>{"<- Back To Search"}</Link>
+
       <h1 className="mt-5">WHYMDb</h1>
       <h2 className="mt-3">Search Results</h2>
       { movies.length
         ? movies.map(movie => (
-          <div id={movie.Search_ID} className="row padding">
+          <div id={movie.Search_ID} style={{ alignContent: "center" }}>
             <div>
               {movie.Searched_Movie_Title}
             </div>

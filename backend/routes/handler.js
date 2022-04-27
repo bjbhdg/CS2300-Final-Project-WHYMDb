@@ -80,7 +80,7 @@ router.post('/searchSubmitted', async (req, res) => {
         OR M.Movie_ID = ANY (
           SELECT W.Movie_ID
           FROM Worked_On as W
-          WHERE W.Film_Worker_ID = (
+          WHERE W.Film_Worker_ID = ANY (
             SELECT Film_Worker_ID
             FROM Film_Workers
             INNER JOIN actor_actress ON Film_Worker_ID = ID
@@ -89,7 +89,7 @@ router.post('/searchSubmitted', async (req, res) => {
         OR M.Movie_ID = ANY (
           SELECT W.Movie_ID
           FROM Worked_On as W
-          WHERE W.Film_Worker_ID = (
+          WHERE W.Film_Worker_ID = ANY (
             SELECT Film_Worker_ID
             FROM Film_Workers
             INNER JOIN Director ON Film_Worker_ID = ID
