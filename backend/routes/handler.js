@@ -77,39 +77,39 @@ router.post('/searchSubmitted', async (req, res) => {
 
         OR M.Release_Date BETWEEN ? AND ?
 
-        OR M.Movie_ID = ANY (
+        OR M.Movie_ID IN (
           SELECT W.Movie_ID
           FROM Worked_On as W
-          WHERE W.Film_Worker_ID = ANY (
+          WHERE W.Film_Worker_ID IN (
             SELECT Film_Worker_ID
             FROM Film_Workers
             INNER JOIN actor_actress ON Film_Worker_ID = ID
             WHERE First_Name = ? OR Last_Name = ?))
 
-        OR M.Movie_ID = ANY (
+        OR M.Movie_ID IN (
           SELECT W.Movie_ID
           FROM Worked_On as W
-          WHERE W.Film_Worker_ID = ANY (
+          WHERE W.Film_Worker_ID IN (
             SELECT Film_Worker_ID
             FROM Film_Workers
             INNER JOIN Director ON Film_Worker_ID = ID
             WHERE First_Name = ? OR Last_Name = ?))
 
-        OR M.Movie_ID = ANY (SELECT P.Movie_ID
+        OR M.Movie_ID IN (SELECT P.Movie_ID
           FROM PRODUCED_BY AS P
           WHERE P.Studio_Name = ?)
 
-        OR M.Movie_ID = ANY (SELECT SH.Movie_ID
+        OR M.Movie_ID IN (SELECT SH.Movie_ID
           FROM SHOWING_IN AS SH
           WHERE SH.Theater_Location = ?)
 
-        OR M.Movie_ID = ANY (SELECT SC.Rated_Movie_ID
+        OR M.Movie_ID IN (SELECT SC.Rated_Movie_ID
           FROM (SELECT R.Movie_ID AS Rated_Movie_ID, (SUM(R.Score) / COUNT(R.Score)) AS Average_Score
             FROM Rating AS R
             GROUP BY R.Movie_ID) AS SC
           WHERE SC.Average_Score BETWEEN ? AND ?)
 
-        OR M.Movie_ID = ANY (SELECT G.Movie_ID
+        OR M.Movie_ID IN (SELECT G.Movie_ID
           FROM Movie_Genres AS G
           WHERE Genre IN ?)
     `;

@@ -9,7 +9,9 @@ function SearchPage() {
   return(
     <div>
       <h1 className="mt-5">WHYMDb</h1>
+
       <p>Begin Searching For Movies By Using the Fields Below:</p>
+      
       <form method="POST" action="/searchSubmitted">
         <table className="mt-3"
           style={{ textAlign: "left", tableLayout: "fixed", marginLeft: "auto", marginRight: "auto", width: "auto" }}

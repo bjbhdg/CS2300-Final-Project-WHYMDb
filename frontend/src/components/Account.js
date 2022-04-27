@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 function Account() {
+  // Upon rerender of the Account page, the user log-in information is grabbed, along with
+  // any ratings the logged in user has made.
   useEffect( () => {
     fetchUserLoggedIn();
     fetchUserRatings();
@@ -13,7 +15,6 @@ function Account() {
   const fetchUserLoggedIn = async () => {
     const data = await fetch('/account');
     const userInfo = await data.json();
-    console.log(userInfo);
     setDelete(false);
     setUser(userInfo);
   };
@@ -21,7 +22,6 @@ function Account() {
   const fetchUserRatings = async () => {
     const rawData = await fetch('/getUserRatings');
     const ratings = await rawData.json();
-    console.log(ratings);
     setUserRatings(ratings);
   };
 
@@ -95,24 +95,26 @@ function Account() {
               <p>Your Movie Ratings:</p>
               {/* Update in the future, make it look prettier. */}
               {userRatings.map(rating => (
-                <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto", marginBottom: "5px" }}
-                  key={rating.Rated_Movie}
+                <table key={rating.Rated_Movie}
+                  style={{ border: "1px solid black", marginLeft: "auto", marginRight: "auto",
+                    width: "25%", marginBottom: "5px" }}
                 >
                   <tbody>
-                    <tr>
-                      <td>Title:</td>
-                      <td>{rating.Rated_Movie}</td>
+                    <tr style={{ border: "1px solid black" }}>
+                      <td style={{ border: "1px solid black", width: "35%" }}>Title:</td>
+                      <td style={{ border: "1px solid black" }}>{rating.Rated_Movie}</td>
                     </tr>
-                    <tr>
-                      <td>Score:</td>
-                      <td>{rating.Score}/10</td>
+                    <tr style={{ border: "1px solid black" }}>
+                      <td style={{ border: "1px solid black", width: "35%" }}>Your Score:</td>
+                      <td style={{ border: "1px solid black" }}>{rating.Score}/10</td>
                     </tr>
                   </tbody>
                 </table>
               ))
               }
             </div>
-            <div> 
+            <div>
+              {/* Route to the POST method for /logout in 'handler.js' to drop the logged in user. */}
               <form method="POST" action="/logout">
                 <input type="submit" value="Log Out" className="btn btn-primary mb-2" />
               </form>
@@ -124,7 +126,9 @@ function Account() {
                       Delete Account
                     </button>
                 }
-                {confirmDelete 
+                { // A "Yes" and "No" button is rendered when a user attempts to delete their account, to ensurer that
+                  // the user wants to follow through with this action.
+                  confirmDelete 
                   ? <div>
                       <p>Are you sure you want to delete your account?</p>
                       <input type="submit" value="Yes" className="btn btn-primary mb-2"
@@ -133,9 +137,10 @@ function Account() {
                       <button type="button" className="btn btn-primary mb-2" 
                         style={{ marginInline: "5px" }} onClick={() => setDelete(false)}
                       >
-                          No
+                        No
                       </button>
                     </div>
+                    // Don't render anything if the user hasn't pressed the "Delete Account" button.
                   : null
                 }
               </form>

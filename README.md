@@ -21,3 +21,9 @@
 ### After `cd`ing into the `backend` folder, run `npm run server` to start the server.
 ## Step 2: Running the Frontend:
 ### In a **new** terminal, `cd` into the `frontend` folder and run `npm start` to run the GUI.
+
+# Notes Before Using the Bash Script.
+## Before using the bash script, you ***MUST*** edit `whymdb_sql_database.sql` with ***YOUR*** information on your local
+## MySQL instance, as well as running the SQL script in said instance, ***AND*** the `.env` file in the `backend` folder,
+## or else the app will not start up correctly on running the script. Also, you can ***ONLY*** use the bash script when
+## in the ***ROOT*** folder of the project. So do not move the script to a different folder/director.

@@ -30,7 +30,7 @@ function SearchResults() {
             </div>
           </div>       
         ))
-        : "It looks like no results came up with your previous search, try again."
+        : "It looks like no results came up with your previous search, please try again."
       }
     </div>
   );
