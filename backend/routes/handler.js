@@ -38,6 +38,9 @@ router.post('/searchSubmitted', async (req, res) => {
   const theatLoc = req.body.theaterLocation;
   const minRate = req.body.minScore;
   const maxRate = req.body.maxScore;
+  const genres = req.body.genreList.split(', ');
+
+  console.log(genres);
 
   pool.getConnection( (err, conn) => {
     if (err) console.log(err);
@@ -95,11 +98,14 @@ router.post('/searchSubmitted', async (req, res) => {
           FROM (SELECT R.Movie_ID AS Rated_Movie_ID, (SUM(R.Score) / COUNT(R.Score)) AS Average_Score
             FROM Rating AS R
             GROUP BY R.Movie_ID) AS SC
-          WHERE SC.Average_Score >= ? AND SC.Average_Score <= ?);
+          WHERE SC.Average_Score BETWEEN ? AND ?)
+        OR M.Movie_ID = ANY (SELECT G.Movie_ID
+          FROM Movie_Genres AS G
+          WHERE Genre IN ?)
     `;
 
     conn.query(searchForMovies,
-        [movieTitle, releaseDate, aFirstName, aLastName, dFirstName, dLastName, stuName, theatLoc, minRate, maxRate],
+        [movieTitle, releaseDate, aFirstName, aLastName, dFirstName, dLastName, stuName, theatLoc, minRate, maxRate, [genres]],
           (err, result) => {
       conn.release();
       if (err) console.log(err);

@@ -64,10 +64,20 @@ function SearchPage() {
               </td>
               <td>
                 <input type="text" name="theaterLocation" placeholder="Theater Address" className="form-control"
-                  style={{ width: "autp" }}
+                  style={{ width: "auto" }}
                 />
               </td>
             </tr>
+            <tr>
+              <td>
+                <label>Genres:</label>
+              </td>
+              <td>
+                <input type="text" name="genreList" placeholder="Genres"
+                  className="form-control" style={{ width: "auto" }}
+                />
+              </td>
+            </tr> 
             <tr>
               <td>
                 <label>Release Date:</label>

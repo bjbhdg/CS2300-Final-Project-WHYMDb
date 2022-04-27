@@ -160,6 +160,7 @@ INSERT INTO Movie(title, release_date) VALUES
 INSERT INTO Movie_Genres VALUES
 (1, "Action"),
 (1, "Comedy"),
+
 (2, "Action"),
 (2, "Adventure");
 
