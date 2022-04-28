@@ -155,18 +155,32 @@ INSERT INTO Theater_Operating_Hours VALUES
 
 INSERT INTO Movie(title, release_date) VALUES
 ("The Bad Guys", "2022-04-22"),
-("Sonic the Hedgehog 2", "2022-04-08");
+("Sonic the Hedgehog 2", "2022-04-08"),
+("Jurassic World Dominion", "2022-06-10"),
+("Memory", "2022-04-29");
 
 INSERT INTO Movie_Genres VALUES
 (1, "Action"),
 (1, "Comedy"),
 
 (2, "Action"),
-(2, "Adventure");
+(2, "Adventure"),
+
+(3, "Action"),
+(3, "Adventure"),
+(3, "Sci-Fi"),
+(3, "Fantasy"),
+
+(4, "Action"),
+(4, "Adventure"),
+(4, "Suspense"),
+(4, "Thriller");
 
 INSERT INTO SHOWING_IN VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 1),
-("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 2);
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 2),
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 3),
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 4);
 
 INSERT INTO Film_Workers(First_Name, Last_Name) VALUES
 ("Pierre", "Perifel"),
@@ -177,23 +191,45 @@ INSERT INTO Film_Workers(First_Name, Last_Name) VALUES
 ("Jeff", "Fowler"),
 ("James", "Marsden"),
 ("Jim", "Carrey"),
-("Ben", "Schwartz");
+("Ben", "Schwartz"),
 
-INSERT INTO Actor_Actress VALUES(2), (3), (4), (6), (7), (8);
+("Colin", "Trevorrow"),
+("Chris", "Pratt"),
+("Bryce", "Howard"),
+("B.D.", "Wong"),
 
-INSERT INTO Director VALUES(1), (5);
+("Martin", "Campbell"),
+("Liam", "Neeson"),
+("Monica", "Bellucci"),
+("Guy", "Pearce");
+
+INSERT INTO Actor_Actress VALUES
+(2), (3), (4),
+(6), (7), (8),
+(10), (11), (12),
+(14), (15), (16);
+
+INSERT INTO Director VALUES
+(1), (5), (9), (13);
 
 INSERT INTO Worked_On VALUES
 (1, 1), (1, 2), (1, 3), (1, 4),
-(2, 5), (2, 6), (2, 7), (2, 8);
+(2, 5), (2, 6), (2, 7), (2, 8),
+(3, 9), (3, 10), (3, 11), (3, 12),
+(4, 13), (4, 14), (4, 15), (4, 16);
+
 
 INSERT INTO Studio VALUES
 ("DreamWorks"),
-("Paramount Pictures");
+("Paramount Pictures"),
+("Universal Studios"),
+("Black Bear Pictures");
 
 INSERT INTO Produced_By VALUES
 (1, "DreamWorks"),
-(2, "Paramount Pictures");
+(2, "Paramount Pictures"),
+(3, "Universal Studios"),
+(4, "Black Bear Pictures");
 
 INSERT INTO DB_User VALUES
 ("The Man", "123456789"),
