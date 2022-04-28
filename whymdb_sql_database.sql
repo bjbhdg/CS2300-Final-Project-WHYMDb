@@ -142,7 +142,9 @@ CREATE TABLE Rating (
 
 -- Sample data to be inserted into each table of the schema.
 INSERT INTO Theater VALUES
-("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "B&B Theaters");
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "B&B Theaters"),
+("1101 E. 18th St., Rolla, MO 65401", "Regal Forum");
+
 
 INSERT INTO Theater_Operating_Hours VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "M", "10:30:00", "01:15:00"),
@@ -151,13 +153,24 @@ INSERT INTO Theater_Operating_Hours VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "Th", "10:30:00", "01:15:00"),
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "F", "10:30:00", "01:15:00"),
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "Sa", "10:30:00", "01:15:00"),
-("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "Su", "10:30:00", "01:15:00");
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "Su", "10:30:00", "01:15:00"),
+
+("1101 E. 18th St., Rolla, MO 65401", "M", "11:00:00", "23:30:00"),
+("1101 E. 18th St., Rolla, MO 65401", "Tu", "11:00:00", "23:30:00"),
+("1101 E. 18th St., Rolla, MO 65401", "W", "11:00:00", "23:30:00"),
+("1101 E. 18th St., Rolla, MO 65401", "Th", "11:00:00", "23:30:00"),
+("1101 E. 18th St., Rolla, MO 65401", "F", "11:00:00", "23:30:00"),
+("1101 E. 18th St., Rolla, MO 65401", "Sa", "11:00:00", "23:30:00"),
+("1101 E. 18th St., Rolla, MO 65401", "Su", "11:00:00", "23:30:00");
 
 INSERT INTO Movie(title, release_date) VALUES
 ("The Bad Guys", "2022-04-22"),
 ("Sonic the Hedgehog 2", "2022-04-08"),
 ("Jurassic World Dominion", "2022-06-10"),
-("Memory", "2022-04-29");
+("Memory", "2022-04-29"),
+("The Northman", "2022-04-22"),
+("Doctor Strange in the Multiverse of Madness", "2022-05-06"),
+("Everything Everywhere All at Once", "2022-03-25");
 
 INSERT INTO Movie_Genres VALUES
 (1, "Action"),
@@ -174,13 +187,34 @@ INSERT INTO Movie_Genres VALUES
 (4, "Action"),
 (4, "Adventure"),
 (4, "Suspense"),
-(4, "Thriller");
+(4, "Thriller"),
+
+(5, "Action"),
+(5, "Adventure"),
+(5, "Drama"),
+
+(6, "Action"),
+(6, "Adventure"),
+
+(7, "Action"),
+(7, "Adventure");
 
 INSERT INTO SHOWING_IN VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 1),
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 2),
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 3),
-("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 4);
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 4),
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 5),
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 6),
+("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 7),
+
+("1101 E. 18th St., Rolla, MO 65401", 1),
+("1101 E. 18th St., Rolla, MO 65401", 2),
+("1101 E. 18th St., Rolla, MO 65401", 3),
+("1101 E. 18th St., Rolla, MO 65401", 4),
+("1101 E. 18th St., Rolla, MO 65401", 5),
+("1101 E. 18th St., Rolla, MO 65401", 6),
+("1101 E. 18th St., Rolla, MO 65401", 7);
 
 INSERT INTO Film_Workers(First_Name, Last_Name) VALUES
 ("Pierre", "Perifel"),
@@ -201,35 +235,61 @@ INSERT INTO Film_Workers(First_Name, Last_Name) VALUES
 ("Martin", "Campbell"),
 ("Liam", "Neeson"),
 ("Monica", "Bellucci"),
-("Guy", "Pearce");
+("Guy", "Pearce"),
+
+("Robert", "Eggers"),
+("Alexander", "Skarsgard"),
+("Nicole", "Kidman"),
+("Claes", "Bang"),
+
+("Sam", "Raimi"),
+("Benedict", "Cumberbatch"),
+("Elizabeth", "Olsen"),
+("Benedict", "Wong"),
+
+("Daniel", "Kwan"),
+("Daniel", "Scheinert"),
+("Michelle", "Yeoh"),
+("Stephanie", "Hsu");
 
 INSERT INTO Actor_Actress VALUES
 (2), (3), (4),
 (6), (7), (8),
 (10), (11), (12),
-(14), (15), (16);
+(14), (15), (16),
+(18), (19), (20),
+(22), (23), (24),
+(26), (27), (28);
 
 INSERT INTO Director VALUES
-(1), (5), (9), (13);
+(1), (5), (9), (13), (17), (21), (25);
 
 INSERT INTO Worked_On VALUES
 (1, 1), (1, 2), (1, 3), (1, 4),
 (2, 5), (2, 6), (2, 7), (2, 8),
 (3, 9), (3, 10), (3, 11), (3, 12),
-(4, 13), (4, 14), (4, 15), (4, 16);
-
+(4, 13), (4, 14), (4, 15), (4, 16),
+(5, 17), (5, 18), (5, 19), (5, 20),
+(6, 21), (6, 22), (6, 23), (6, 24),
+(7, 25), (7, 26), (7, 27), (7, 28);
 
 INSERT INTO Studio VALUES
 ("DreamWorks"),
 ("Paramount Pictures"),
 ("Universal Studios"),
-("Black Bear Pictures");
+("Black Bear Pictures"),
+("Regency Enterprises"),
+("Walt Disney Studios"),
+("AGBO");
 
 INSERT INTO Produced_By VALUES
 (1, "DreamWorks"),
 (2, "Paramount Pictures"),
 (3, "Universal Studios"),
-(4, "Black Bear Pictures");
+(4, "Black Bear Pictures"),
+(5, "Regency Enterprises"),
+(6, "Walt Disney Studios"),
+(7, "AGBO");
 
 INSERT INTO DB_User VALUES
 ("The Man", "123456789"),
