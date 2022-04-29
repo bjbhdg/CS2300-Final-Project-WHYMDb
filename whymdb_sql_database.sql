@@ -274,7 +274,7 @@ INSERT INTO Worked_On VALUES
 (7, 25), (7, 26), (7, 27), (7, 28);
 
 INSERT INTO Studio VALUES
-("DreamWorks"),
+("Dreamworks"),
 ("Paramount Pictures"),
 ("Universal Studios"),
 ("Black Bear Pictures"),
@@ -306,4 +306,12 @@ VALUES
 (1, "A Man", 10, ":)", ":)"),
 (1, "Me", 10, "Haven't Seen It", "no comment"),
 (1, "That One Guy", 0, "Bad", "I'm that one guy!"),
-(2, "The Man", 8, "SONIIICC YEAHH!!!", "WOOOOOOOOOOH");
+(2, "The Man", 8, "SONIIICC YEAHH!!!", "WOOOOOOOOOOH"),
+(3, "Me", 6, "Ehhh...", "Just not as good as the old ones!"),
+(5, "Me", 7, "Not bad", "Worth the watch if you have nothing else to do"),
+(2, "That One Guy", 9, "Watch It!", "So good!"),
+(6, "That One Guy", 9, "Go see it", "Really Good"),
+(4, "The Man", 8, "8", "Go see it"),
+(7, "Me", 7, "OK", "Pretty Good"),
+(5, "A Man", 10, "Watch it!", "So good!!"),
+(7, "A Man", 4, "Don't go", "I fell asleep");
