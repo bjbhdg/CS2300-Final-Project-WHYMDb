@@ -300,4 +300,10 @@ router.post('/deleteAccount', async (req, res) => {
   res.end();
 });
 
+router.post('/editDatabase', async (req, res) => {
+  console.log("Final Results:", req.body);
+  res.redirect("/account")
+  res.end();
+});
+
 module.exports = router;

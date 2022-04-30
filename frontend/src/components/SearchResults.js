@@ -24,7 +24,7 @@ function SearchResults() {
       <h2 className="mt-3">Search Results</h2>
       { movies.length
         ? movies.map(movie => (
-          <div id={movie.Search_ID} style={{ alignContent: "center" }}>
+          <div key={movie.Search_ID} style={{ alignContent: "center" }}>
             <div>
               {movie.Searched_Movie_Title}
             </div>

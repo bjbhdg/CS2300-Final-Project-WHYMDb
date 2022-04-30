@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import EditDatabase from './EditDatabase';
 
 function Account() {
   // Upon rerender of the Account page, the user log-in information is grabbed, along with
@@ -11,11 +12,13 @@ function Account() {
   const [currentUser, setUser] = useState([]);
   const [userRatings, setUserRatings] = useState([]);
   const [confirmDelete, setDelete] = useState([]);
+  const [openEdit, setEdit] = useState([]);
 
   const fetchUserLoggedIn = async () => {
     const data = await fetch('/account');
     const userInfo = await data.json();
     setDelete(false);
+    setEdit(false);
     setUser(userInfo);
   };
 
@@ -25,7 +28,7 @@ function Account() {
     setUserRatings(ratings);
   };
 
-  return(
+  return (
     <div>
       <h1 className="mt-5">WHYMDb</h1>
       { // If the user has not logged in yet, render this.
@@ -88,6 +91,19 @@ function Account() {
 
           // If the user is logged in, render this.
         : <div>
+            { currentUser[0].Is_Moderator
+              ? <div>
+                  <p>Since You're a Moderator:</p>
+                  { openEdit
+                    ? <EditDatabase username={currentUser[0].Logged_In_Username} mod={currentUser[0].Is_Moderator} />
+                    : null
+                  }
+                  <button type="button" className="btn btn-primary mb-2" onClick={() => setEdit(!openEdit)}>
+                    {!openEdit ? "Open Edit" : "Close Edit"}
+                  </button>
+                </div>
+              : null
+            }
             <h2 className='mt-3'>
               {`Welcome "${currentUser[0].Logged_In_Username}"!`}
             </h2>
