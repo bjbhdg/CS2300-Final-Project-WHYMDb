@@ -34,15 +34,20 @@ class EditDatabase extends React.Component {
       studioChosen: false,
       producedByChosen: false,
       dbUserChosen: false,
-      ratingChosen: false
+      ratingChosen: false,
+
+      disableRelationChoice: true,
+      chosenRelation: ""
     }
 
     this.changeChosenDBEditType = this.changeChosenDBEditType.bind(this);
     this.changeRenderedRelationOption = this.changeRenderedRelationOption.bind(this);
+    this.changeRouterURL = this.changeRouterURL.bind(this);
+    this.getPreexistingTuple = this.getPreexistingTuple.bind(this);
   }
 
   changeChosenDBEditType(event) {
-    this.setState(resetDBUpdateType);
+    this.setState({...resetDBUpdateType, disableRelationChoice: false});
 
     switch(event.target.value) {
       case "UPDATE":
@@ -105,29 +110,132 @@ class EditDatabase extends React.Component {
       default:
         console.log("How did you even get here? What did you do??? >:(");
     }
+
+    this.getPreexistingTuple(event);
+  }
+
+  getPreexistingTuple(event) {
+    switch(event.target.value) {
+      case "Theater":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      case "Movie":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      case "SHOWING_IN":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+      
+      case "Film_Worker":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      case "WORKED_ON":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      case "Studio":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      case "PRODUCED_BY":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      case "DB_User":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      case "Rating":
+        this.setState({ chosenRelation: event.target.value });
+        break;
+
+      default:
+        console.log("If you managed to get here, run...");
+    }
+  }
+
+  changeRouterURL(event) {
+    if(this.state.deleteDBChosen) {
+      document.getElementById("alterDatabase").action = `delete${event.target.value}`;
+    } else if(this.state.updateDBChosen) {
+      document.getElementById("alterDatabase").action = `update${event.target.value}`;
+    } else if(this.state.insertDBChosen) {
+      document.getElementById("alterDatabase").action = `insert${event.target.value}`;
+    }
   }
 
   renderFilmWorkerEdit() {
     return (
       <div style={{ marginTop: "5px" }}>
         <div style={{ display: "inline-flex", marginLeft: "auto", marginRight: "auto" }}>
-          <p>Be Sure to Specify What Kind of Film Worker:</p>
+
+          <p>Be Sure to Specify What Type of Film Worker:</p>
+
           <div>
-            <input style={{ marginLeft: "10px" }} type="radio" name="filmWorkerType" id="actor" value="Actor_Actress" />
+            <input style={{ marginLeft: "10px" }} type="radio" name="filmWorkerType" id="actor" value="Actor_Actress"
+              onChange={event => this.changeRouterURL(event)}
+            />
             <label style={{ marginLeft: "2px" }} htmlFor="actor">Actor/Actress</label>
           </div>
           <div>
-            <input style={{ marginLeft: "10px" }} type="radio" name="filmWorkerType" id="director" value="Director" />
+            <input style={{ marginLeft: "10px" }} type="radio" name="filmWorkerType" id="director" value="Director"
+              onChange={event => this.changeRouterURL(event)}
+            />
             <label style={{ marginLeft: "2px" }} htmlFor="director">Director</label>
           </div>
+
         </div>
 
         { this.state.updateDBChosen
-          ? <p>Radtasitcal</p>
+          ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+              <tbody>
+                <tr>
+                  <td><label>Film Maker ID:</label></td>
+                  <td><input type="number" name="filmWorkerID" placeholder="Actor/Director ID" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Updated First Name:</label></td>
+                  <td><input type="text" name="newFirstName" placeholder="First Name" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Updated Last Name:</label></td>
+                  <td><input type="text" name="newLastName" placeholder="Last Name" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Make Specified Film Worker Type?</label></td>
+                  <td><input type="checkbox" name="specifyFWType" /></td>
+                </tr>
+              </tbody>
+          </table>
           : this.state.deleteDBChosen
-            ? <p>Cool</p>
+            ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                <tbody>
+                  <tr>
+                    <td><label>Film Worker ID:</label></td>
+                    <td><input type="number" name="filmWorkerID" placeholder="Actor/Director ID" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Only Remove Specified Film Worker Type?</label></td>
+                    <td><input type="checkbox" name="specifyFWType" /></td>
+                </tr>
+                </tbody>
+            </table>
             : this.state.insertDBChosen
-              ? <p>Awesome</p>
+              ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                  <tbody>
+                    <tr>
+                      <td><label>First Name:</label></td>
+                      <td><input type="text" name="firstName" placeholder="First Name" className="form-control" /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Last Name:</label></td>
+                      <td><input type="text" name="lastName" placeholder="Last Name" className="form-control" /></td>
+                    </tr>
+                  </tbody>
+                </table>
               : null
         }
 
@@ -140,7 +248,7 @@ class EditDatabase extends React.Component {
       <div style={{ marginLeft: "auto", marginRight: "auto" }}>
         <h2 className="mt-3">Edit Database:</h2>
         <div>
-          <form method="POST" action='/editDatabase'>
+          <form id="alterDatabase" method="POST" action='/editDatabase'>
             <div style={{ display: "inline-flex" }}>
               <p>Action You Will Perform:</p>
               <div>
@@ -164,7 +272,7 @@ class EditDatabase extends React.Component {
             </div>
 
             <p>Select the Relation you Would Like To Edit:</p>
-            <select id="selectedRelation" name="selectedRelation">
+            <select disabled={this.state.disableRelationChoice} id="selectedRelation" name="selectedRelation">
 
               <option value="Theater" onClick={event => this.changeRenderedRelationOption(event)}>
                 Theater

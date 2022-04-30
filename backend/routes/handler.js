@@ -300,9 +300,219 @@ router.post('/deleteAccount', async (req, res) => {
   res.end();
 });
 
+// This is a DEFAULT route that the edit function will be sent to. It does not actually do anything, it
+// is simply a placeholder to be replaced by the plethora of other connections below.
 router.post('/editDatabase', async (req, res) => {
-  console.log("Final Results:", req.body);
+  console.log("Nothing was changed, make sure to fill out all fields.", req.body);
   res.redirect("/account")
+  res.end();
+});
+
+// Below is an attempt to show the mods a query for each relation, may reimplement in the future.
+/*
+router.get('/getTheaterRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log;
+    try {
+      conn.query(`SELECT * FROM Movie AS M INNER JOIN Movie_Genres AS G ON M.Movie_ID = G.Movie_ID`, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getMovieRows', async (req, res) => {
+    pool.getConnection( (err, conn) => {
+      if (err) console.log;
+      try {
+      conn.query(`SELECT * FROM Movie AS M INNER JOIN Movie_Genres AS G ON M.Movie_ID = G.Movie_ID`, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+*/
+
+// ================================
+// =====   EDIT CONNECTIONS   =====
+// ================================
+
+router.post('/updateActor_Actress', async(req, res) => {
+  const idToUpdate = req.body.filmWorkerID;
+  const updateToActorActress = req.body.specifyFWType;
+  const newFName = req.body.newFirstName;
+  const newLName = req.body.newLastName;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if(updateToActorActress === "on") {
+      conn.query(`INSERT INTO Actor_Actress VALUES(${idToUpdate})`, (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToUpdate} is now an Actor/Actress.`);
+      });
+    }
+
+    const updateActQry = `UPDATE Film_Workers SET First_Name=?, Last_Name=? WHERE Film_Worker_ID=?`;
+
+    conn.query(updateActQry, [newFName, newLName, idToUpdate], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Film Worker ID #${idToRemove} has been updated.`);
+    });
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+
+router.post('/deleteActor_Actress', async (req, res) => {
+  console.log(req.body);
+  const idToRemove = req.body.filmWorkerID;
+  const removeFromActorActressSpecifically = req.body.specifyFWType;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if(removeFromActorActressSpecifically === "on") {
+      conn.query(`DELETE FROM Actor_Actress WHERE ID=${idToRemove}`, (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToRemove} is no longer an Actor/Actress.`);
+      });
+    } else {
+      conn.query(`DELETE FROM Film_Workers WHERE Film_Worker_ID=${idToRemove}`, (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToRemove} is removed from the database.`);
+      });
+    }
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+
+router.post('/insertActor_Actress', async (req, res) => {
+  const actorToAddFName = req.body.firstName;
+  const actorToAddLName = req.body.lastName;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const actorInsertQuery = `INSERT INTO Film_Workers(First_Name, Last_Name) VALUES(?, ?)`;
+
+    conn.query(actorInsertQuery, [actorToAddFName, actorToAddLName], (err, result) => {
+      if (err) console.log(err);
+      else console.log("Actor/Actress Inserted!");
+    });
+
+    // Due to the "auto_increment" property of Film_Worker_ID, any newly inserted tuple into the table will
+    // always have the largest key value of any other keys.
+    const quickUpdate = `INSERT INTO Actor_Actress SELECT MAX(Film_Worker_ID) FROM Film_Workers`;
+    conn.query(quickUpdate, (err, result) => {
+      if (err) console.log(err);
+      else console.log("Actor/Actress Insertion Fully Completed!");
+    });
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+
+router.post('/updateDirector', async(req, res) => {
+  const idToUpdate = req.body.filmWorkerID;
+  const updateToDirector = req.body.specifyFWType;
+  const newFName = req.body.newFirstName;
+  const newLName = req.body.newLastName;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if(updateToDirector === "on") {
+      conn.query(`INSERT INTO Director VALUES(${idToUpdate})`, (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToUpdate} is now a Director.`);
+      });
+    }
+
+    const updateDIRQry = `UPDATE Film_Workers SET First_Name=?, Last_Name=? WHERE Film_Worker_ID=?`;
+
+    conn.query(updateDirQry, [newFName, newLName, idToUpdate], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Film Worker ID #${idToRemove} has been updated.`);
+    });
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+
+router.post('/deleteDirector', async (req, res) => {
+  console.log(req.body);
+  const idToRemove = req.body.filmWorkerID;
+  const removeFromDirectorSpecifically = req.body.specifyFWType;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if(removeFromDirectorSpecifically === "on") {
+      conn.query(`DELETE FROM Director WHERE ID=${idToRemove}`, (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToRemove} is no longer a Director.`);
+      });
+    } else {
+      conn.query(`DELETE FROM Film_Workers WHERE Film_Worker_ID=${idToRemove}`, (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToRemove} is removed from the database.`);
+      });
+    }
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+
+router.post('/insertDirector', async (req, res) => {
+  const directorToAddFName = req.body.firstName;
+  const directorToAddLName = req.body.lastName;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const actorInsertQuery = `INSERT INTO Film_Workers(First_Name, Last_Name) VALUES(?, ?)`;
+
+    conn.query(actorInsertQuery, [directorToAddFName, directorToAddLName], (err, result) => {
+      if (err) console.log(err);
+      else console.log("Director Inserted!");
+    });
+
+    // Due to the "auto_increment" property of Film_Worker_ID, any newly inserted tuple into the table will
+    // always have the largest key value of any other keys.
+    const quickUpdate = `INSERT INTO Director SELECT MAX(Film_Worker_ID) FROM Film_Workers`;
+    conn.query(quickUpdate, (err, result) => {
+      if (err) console.log(err);
+      else console.log("Director Insertion Fully Completed!");
+    });
+  });
+
+  res.redirect("/account");
   res.end();
 });
 
