@@ -2,6 +2,7 @@ import React from 'react';
 
 class ShowRelationData extends React.Component {
   constructor(props) {
+    // The props sent to ShowRelationData include the name of the relation chosen from '/editDatabase.'
     super(props);
 
     this.state = {
@@ -11,6 +12,8 @@ class ShowRelationData extends React.Component {
     this.fetchRelationRows();
   }
 
+  // In accordance to the props, the tuples present in the passed in relation's table is sent
+  // retrieved and assigned to the state variable relationRows.
   async fetchRelationRows() {
     if(this.props.currRelation !== "Default") {
        const data = await fetch(`/get${this.props.currRelation}Rows`);
@@ -26,7 +29,9 @@ class ShowRelationData extends React.Component {
       <div style={{ marginLeft: "auto", marginRight: "auto", overflow: "auto", maxWidth: "500px", maxHeight: "200px" }}>
         <table style={{ marginLeft: "auto", marginRight: "auto", border: "1px solid black", width: "auto", height: "auto" }}
         >
-          { this.state.relationRows !== null
+          { // This deeply nested ternary operator renders the data from the passsed in relation. Each relation needs to be
+            // handled differently, so each entry in the ternary operator will render the corresponding relation correctly.
+            this.state.relationRows !== null
             ? this.props.currRelation === "Theater"
               ? <tbody>
                   <tr style={{ border: "1px solid black" }}>

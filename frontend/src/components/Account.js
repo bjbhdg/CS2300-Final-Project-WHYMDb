@@ -13,6 +13,7 @@ function Account() {
   const [userRatings, setUserRatings] = useState([]);
   const [confirmDelete, setDelete] = useState([]);
 
+  // Grabs log in information.
   const fetchUserLoggedIn = async () => {
     const data = await fetch('/account');
     const userInfo = await data.json();
@@ -20,6 +21,7 @@ function Account() {
     setUser(userInfo);
   };
 
+  // Grabs user created ratings to display.
   const fetchUserRatings = async () => {
     const rawData = await fetch('/getUserRatings');
     const ratings = await rawData.json();
@@ -89,10 +91,15 @@ function Account() {
 
           // If the user is logged in, render this.
         : <div>
-            { currentUser[0].Is_Moderator
+            { // If the logged in user is a moderator, then render a link to the '/editDatabase' page.
+              currentUser[0].Is_Moderator
               ? <div>
                   <p>Since You're a Moderator:</p>
-                  <Link to="/editDatabase" className="btn btn-primary mb-2" >Open Edit</Link>
+                  <Link to={{ pathname: "/editDatabase", state: { isMod: currentUser[0].Is_Moderator }}}
+                    className="btn btn-primary mb-2"
+                  >
+                    Open Edit
+                  </Link>
                 </div>
               : null
             }

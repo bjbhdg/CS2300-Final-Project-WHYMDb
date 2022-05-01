@@ -2,6 +2,8 @@ import React from 'react';
 import ShowRelationData from './ShowRelationData';
 import {Link} from 'react-router-dom';
 
+// Each time the user presses "update", "delete", or "insert", we will
+// reset the edit state before choosing the correct one.
 const resetDBUpdateType = {
   updateDBChosen: false,
   deleteDBChosen: false,
@@ -11,6 +13,8 @@ const resetDBUpdateType = {
   toggleGenreEdit: false
 }
 
+// Similar to resetDBUpdateType, each time the user selects a new relation to alter, the
+// state choosing which one to render is reset before choosing the correct one.
 const resetDropDownMenu = {
   theaterChosen: false,
   movieChosen: false,
@@ -28,8 +32,14 @@ const resetDropDownMenu = {
 };
 
 class EditDatabase extends React.Component {
+  // When pressing the "Edit Database" button on a moderator's account page, data is passed through the '/account'
+  // page to the '/editDatabase' page. Specifically, whether or not a user is logged in, and whether or not
+  // that user is a moderator.
   constructor(props) {
     super(props);
+
+    // The state variables for the EditDatabase class involve the methods by which the database will be edited ('update',
+    // 'delete', and 'insert'), the relations chosen to be edited, and various rendering toggles.
     this.state = {
       updateDBChosen: false,
       deleteDBChosen: false,
@@ -50,17 +60,39 @@ class EditDatabase extends React.Component {
       toggleGenreEdit: false,
 
       currChosenRelation: "Default",
-      showRelationRows: false
+      showRelationRows: false,
+
+      isMod: false
     }
 
+    this.fetchModStatus();
+
+    // Allows for an HTML event object to be passed through a function. This event object will allow us to grab the
+    // value of a selected button/input.
     this.changeChosenDBEditType = this.changeChosenDBEditType.bind(this);
     this.changeRenderedRelationOption = this.changeRenderedRelationOption.bind(this);
     this.changeRouterURL = this.changeRouterURL.bind(this);
   }
 
+  // Makes sure that the user accessing the page is logged in and they are a moderator.
+  async fetchModStatus() {
+    const data = await fetch('/account');
+    const logInInfo = await data.json();
+    if(logInInfo.length) {
+      this.setState({ isMod: logInInfo[0].Is_Moderator })
+    } else {
+      this.setState({ isMod: false })
+    }
+  }
+
+  // This function changes the editing type for altering the database whenever a user
+  // presses either 'update', 'delete' or 'insert' button. This will be used to render the
+  // correct page for each chosen relation.
   changeChosenDBEditType(event) {
+    // Resets database update type
     this.setState({ ...resetDBUpdateType, disableRelationChoice: false});
 
+    // Chooses correct update type
     switch(event.target.value) {
       case "update":
         this.setState({ updateDBChosen: true });
@@ -79,6 +111,8 @@ class EditDatabase extends React.Component {
     }
   }
 
+  // Similar to changeChosenDBEditType(), this function sets the state for which relation edit modal to
+  // render, depending on the chosen relation from the drop down menu.
   changeRenderedRelationOption(event) {
     switch(event.target.value) {
       case "Theater":
@@ -124,6 +158,8 @@ class EditDatabase extends React.Component {
     this.setState({ currChosenRelation: event.target.value });
   }
 
+  // Depending on the dbUpdateType and the selectedRelation values, the URL to post changes to will be updated to
+  // match either the database update type and the relation to alter.
   changeRouterURL(event) {
     // Grabs the current route that the edit database form will submit data to.
     const currentRoute = document.getElementById("alterDatabase").attributes.action.value;
@@ -153,6 +189,12 @@ class EditDatabase extends React.Component {
     }
   }
 
+// =====================================
+// ========= RELATION RENDERS ==========
+// =====================================
+
+// Each of these "render" functions will render the input fields for the user to enter into
+// depending on the database update type selected and the relation selected.
   renderTheaterEdit() {
     const daysOfWeek = ["M", "Tu", "W", "Th", "F", "Sa", "Su"];
     const dayOfWeekDDMEntries = daysOfWeek.map((day) =>
@@ -353,7 +395,7 @@ class EditDatabase extends React.Component {
         <div style={{ display: "inline-flex", marginLeft: "auto", marginRight: "auto" }}>
 
           <p>Be Sure to Specify What Type of Film Worker:</p>
-
+          {/* The user will select either Actor/Actress or Director in this radio button array. */}
           <div>
             <input style={{ marginLeft: "10px" }} type="radio" name="filmWorkerType" id="actor" value="Actor_Actress"
               onChange={event => this.changeRouterURL(event)}
@@ -389,7 +431,7 @@ class EditDatabase extends React.Component {
                   <td><input type="checkbox" name="specifyFWType" /></td>
                 </tr>
               </tbody>
-          </table>
+            </table>
           : this.state.deleteDBChosen
             ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
                 <tbody>
@@ -402,7 +444,7 @@ class EditDatabase extends React.Component {
                     <td><input type="checkbox" name="specifyFWType" /></td>
                 </tr>
                 </tbody>
-            </table>
+              </table>
             : this.state.insertDBChosen
               ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
                   <tbody>
@@ -501,7 +543,7 @@ class EditDatabase extends React.Component {
                   <td><input type="text" name="newFWorker" placeholder="Film Worker ID" className="form-control" /></td>
                 </tr>
               </tbody>
-        </table>
+            </table>
           : this.state.deleteDBChosen
             ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
                 <tbody>
@@ -761,106 +803,119 @@ class EditDatabase extends React.Component {
       </table>
     );
   }
+  // =====================================
 
   render() {
     return (
-      <div style={{ marginLeft: "auto", marginRight: "auto" }}>
-        <h1 className="mt-5">WHYMDb</h1>
-        <h2 className="mt-3">Edit Database:</h2>
-        <div>
-          <form id="alterDatabase" method="POST" action='/editDatabaseDefault'>
-            <div style={{ display: "inline-flex" }}>
-              <p>Action You Will Perform:</p>
-              <div>
-                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="update" value="update"
-                  onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}} 
-                />
-                <label style={{ marginLeft: "2px" }} htmlFor="update">Update</label>
-              </div>
-              <div>
-                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="delete" value="delete"
-                  onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}}
-                />
-                <label style={{ marginLeft: "2px" }} htmlFor="delete">Delete</label>
-              </div>
-              <div>
-                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="insert" value="insert"
-                  onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}}
-                />
-                <label style={{ marginLeft: "2px" }} htmlFor="insert">Insert</label>
-              </div>
-            </div>
-
-            <p>Select the Relation you Would Like To Edit:</p>
-            <select disabled={this.state.disableRelationChoice} id="selectedRelation" name="selectedRelation">
-              <option value="Default" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                -Select Relation-
-              </option>
-
-              <option value="Theater" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                Theater
-              </option>
-
-              <option value="Movie" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                Movie
-              </option>
-
-              <option value="SHOWING_IN" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                Showing In
-              </option>
-
-              <option value="Film_Workers" onClick={event => this.changeRenderedRelationOption(event)}>
-                Film Worker
-              </option>
-
-              <option value="WORKED_ON" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                Worked On
-              </option>
-
-              <option value="Studio" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                Studio
-              </option>
-
-              <option value="PRODUCED_BY" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                Produced By
-              </option>
-
-              <option value="DB_User" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                User
-              </option>
-
-              <option value="Rating" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
-                Rating
-              </option>
-
-            </select><br/>
-
+      <div>
+      {/* The ternary operator below prevents the entire page from being rendered if a user manages to enter
+        * '/editDatabase' if no one is logged in or if a logged in user is not a moderator. */}
+      { (this.state.isMod)
+        ? <div style={{ marginLeft: "auto", marginRight: "auto" }}>
+            <h1 className="mt-5">WHYMDb</h1>
+            <h2 className="mt-3">Edit Database:</h2>
             <div>
-              <label>{`Show Existing Entries in the ${this.state.currChosenRelation} Relation?`}</label>
-              <input type="checkbox" checked={this.state.showRelationRows} style={{ marginLeft: "5px" }}
-                onChange={() => this.setState({ showRelationRows: !this.state.showRelationRows })}
-              />
-              { this.state.showRelationRows
-                ? <ShowRelationData currRelation={this.state.currChosenRelation} />
-                : null
-              }
+              <form id="alterDatabase" method="POST" action='/editDatabaseDefault'>
+                {/* Radio Button array of 'Update', 'Delete', and 'Insert' database edit types. */}
+                <div style={{ display: "inline-flex" }}>
+                  <p>Action You Will Perform:</p>
+                  <div>
+                    <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="update" value="update"
+                      onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}} 
+                    />
+                    <label style={{ marginLeft: "2px" }} htmlFor="update">Update</label>
+                  </div>
+                  <div>
+                    <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="delete" value="delete"
+                      onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}}
+                    />
+                    <label style={{ marginLeft: "2px" }} htmlFor="delete">Delete</label>
+                  </div>
+                  <div>
+                    <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="insert" value="insert"
+                      onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}}
+                    />
+                    <label style={{ marginLeft: "2px" }} htmlFor="insert">Insert</label>
+                  </div>
+                </div>
+
+                {/* Drop Down Menu of Database Schema Relations. */}
+                <p>Select the Relation you Would Like To Edit:</p>
+                <select disabled={this.state.disableRelationChoice} id="selectedRelation" name="selectedRelation">
+                  <option value="Default" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    -Select Relation-
+                  </option>
+
+                  <option value="Theater" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    Theater
+                  </option>
+
+                  <option value="Movie" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    Movie
+                  </option>
+
+                  <option value="SHOWING_IN" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    Showing In
+                  </option>
+
+                  <option value="Film_Workers" onClick={event => this.changeRenderedRelationOption(event)}>
+                    Film Worker
+                  </option>
+
+                  <option value="WORKED_ON" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    Worked On
+                  </option>
+
+                  <option value="Studio" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    Studio
+                  </option>
+
+                  <option value="PRODUCED_BY" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    Produced By
+                  </option>
+
+                  <option value="DB_User" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    User
+                  </option>
+
+                  <option value="Rating" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                    Rating
+                  </option>
+                </select><br/>
+
+                {/* This <div> includes the checkbox that a user can tick on or off to show the current
+                  * contents of the selected relation.*/}
+                <div>
+                  <label>{`Show Existing Entries in the ${this.state.currChosenRelation} Relation?`}</label>
+                  <input type="checkbox" checked={this.state.showRelationRows} style={{ marginLeft: "5px" }}
+                    onChange={() => this.setState({ showRelationRows: !this.state.showRelationRows })}
+                  />
+                  { this.state.showRelationRows
+                    ? <ShowRelationData currRelation={this.state.currChosenRelation} />
+                    : null
+                  }
+                </div>
+                <p>Use the Fields Below to Alter the Database:</p>
+                {/* Below is where the edit pages for each of the relations will be rendered. */}
+                <div>
+                  { this.state.theaterChosen ? this.renderTheaterEdit() : null }
+                  { this.state.filmWorkerChosen ? this.renderFilmWorkerEdit() : null }
+                  { this.state.movieChosen ? this.renderMovieEdit() : null }
+                  { this.state.showingInChosen ? this.renderShowingInEdit() : null }
+                  { this.state.workedOnChosen ? this.renderWorkedOnEdit() : null }
+                  { this.state.studioChosen ? this.renderStudioEdit() : null }
+                  { this.state.producedByChosen ? this.renderProducedByEdit() : null }
+                  { this.state.dbUserChosen ? this.renderDBUserEdit() : null }
+                  { this.state.ratingChosen ? this.renderRatingEdit() : null }
+                </div>
+                <input type="submit" className="btn btn-primary mb-2" value="Submit Changes" style={{ marginTop: "5px" }} />
+              </form>
+              {/* Button that leads back to the '/account' page. */}
+              <Link to="/account" className="btn btn-primary mb-2">Return to Account</Link>
             </div>
-            <p>Use the Fields Below to Alter the Database:</p>
-            <div>
-              { this.state.theaterChosen ? this.renderTheaterEdit() : null }
-              { this.state.filmWorkerChosen ? this.renderFilmWorkerEdit() : null }
-              { this.state.movieChosen ? this.renderMovieEdit() : null }
-              { this.state.showingInChosen ? this.renderShowingInEdit() : null }
-              { this.state.workedOnChosen ? this.renderWorkedOnEdit() : null }
-              { this.state.studioChosen ? this.renderStudioEdit() : null }
-              { this.state.producedByChosen ? this.renderProducedByEdit() : null }
-              { this.state.dbUserChosen ? this.renderDBUserEdit() : null }
-              { this.state.ratingChosen ? this.renderRatingEdit() : null }
-            </div>
-            <input type="submit" className="btn btn-primary mb-2" value="Submit Changes" style={{ marginTop: "5px" }} />
-          </form>
-          <Link to="/account" className="btn btn-primary mb-2">Return to Account</Link>
-        </div>
+          </div>
+         : <p>{"You're not supposed to be here >:("}</p>
+      }
       </div>
     );
   }
