@@ -439,7 +439,8 @@ router.get('/getPRODUCED_BYRows', async (req, res) => {
 
     try {
       const getProducedByRows = `SELECT M.Movie_ID, M.Title, Studio_Name
-        FROM PRODUCED_BY AS P, Movie AS M WHERE P.Movie_ID = M.Movie_ID`;
+        FROM PRODUCED_BY AS P, Movie AS M WHERE P.Movie_ID = M.Movie_ID
+        ORDER BY M.Movie_ID ASC`;
 
         conn.query(getProducedByRows, (err, result) => {
           if (err) console.log(err);
@@ -1030,6 +1031,149 @@ router.post('/insertWORKED_ON', async (req, res) => {
   res.redirect('/account');
   res.end();
 });
+// ===============================
+
+// ===============================
+// ========= STUDIO EDITS ========
+// ===============================
+router.post('/updateStudio', async (req, res) => {
+  const origStudio = req.body.origStudio;
+  const newStudio = req.body.newStudio;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const updateStudioQry = `UPDATE Studio SET Studio_Name=? WHERE Studio_Name=?`;
+
+    conn.query(updateStudioQry, [newStudio, origStudio], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Studio ${origStudio} has been updated to ${newStudio}.`);
+    });
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+
+router.post('/deleteStudio', async (req, res) => {
+  const studioToRemove = req.body.studioToDelete;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const deleteStudioQry = `DELETE FROM Studio Where Studio_Name=?`;
+
+    conn.query(deleteStudioQry, [studioToRemove], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Studio ${studioToRemove} has been removed successfully.`);
+    });
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+
+router.post('/insertStudio', async (req, res) => {
+  const studioToAdd = req.body.studioToAdd;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const studioInsertQry = `INSERT INTO Studio VALUES(?)`;
+
+    conn.query(studioInsertQry, [studioToAdd], (err, result) => {
+      if (err) console.log(err);
+      else console.log(`Studio ${studioToAdd} has been successfully added.`);
+    });
+  });
+
+  res.redirect("/account");
+  res.end();
+});
+// ===============================
+
+// ===============================
+// ====== PRODUCED_BY EDITS ======
+// ===============================
+router.post('/updatePRODUCED_BY', async (req, res) => {
+  const originalStudio = req.body.origStudio
+  const originalMovie = req.body.origMovie;
+  const newStudio = req.body.newStudio;
+  const newMovie = req.body.newMovie;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const updateQry = `UPDATE PRODUCED_BY SET Studio_Name=?, Movie_ID=? WHERE Studio_Name=? AND Movie_ID=?`;
+
+    if (newStudio !== "" && newMovie !== "") {
+      conn.query(updateQry, [newStudio, newMovie, originalStudio, originalMovie], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Produced By For Movie ID #${originalMovie} with ${originalStudio} successfully updated.`);
+      });
+    } else if (newStudio !== "" && newMovie === "") {
+      conn.query(updateQry, [newStudio, originalMovie, originalStudio, originalMovie], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Produced By For Movie ID #${originalMovie} with ${originalStudio} successfully updated.`);
+      });
+    } else if (newStudio === "" && newMovie !== "") {
+      conn.query(updateQry, [originalStudio, newMovie, originalStudio, originalMovie], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Produced By For Movie ID #${originalMovie} with ${originalStudio} successfully updated.`);
+      })
+    }
+    conn.release();
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/deletePRODUCED_BY', async (req, res) => {
+  const studioToDelete = req.body.studioToDelete;
+  const movieToDelete = req.body.movieToDelete;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const deleteQry = `DELETE FROM PRODUCED_BY WHERE Studio_Name=? AND Movie_ID=?`
+    conn.query(deleteQry, [studioToDelete, movieToDelete], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Movie ID #${movieToDelete} produced by ${studioToDelete} has been successfully deleted.`);
+    });
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/insertPRODUCED_BY', async (req, res) => {
+  const studioToAdd = req.body.studioToAdd;
+  const movieToAdd = req.body.movieToAdd;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const insertQry = `INSERT INTO PRODUCED_BY VALUES(?, ?)`;
+    conn.query(insertQry, [movieToAdd, studioToAdd], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Movie ID #${movieToAdd} was produced by studio ${studioToAdd}.`);
+    });
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+// ===============================
+
+// ===============================
+// ========== USER EDITS =========
+// ===============================
+
+// ===============================
+// ======== RATING EDITS =========
 // ===============================
 
 module.exports = router;
