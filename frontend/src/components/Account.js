@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import EditDatabase from './EditDatabase';
+import {Link} from 'react-router-dom';
 
 function Account() {
   // Upon rerender of the Account page, the user log-in information is grabbed, along with
@@ -12,13 +12,11 @@ function Account() {
   const [currentUser, setUser] = useState([]);
   const [userRatings, setUserRatings] = useState([]);
   const [confirmDelete, setDelete] = useState([]);
-  const [openEdit, setEdit] = useState([]);
 
   const fetchUserLoggedIn = async () => {
     const data = await fetch('/account');
     const userInfo = await data.json();
     setDelete(false);
-    setEdit(false);
     setUser(userInfo);
   };
 
@@ -94,13 +92,7 @@ function Account() {
             { currentUser[0].Is_Moderator
               ? <div>
                   <p>Since You're a Moderator:</p>
-                  { openEdit
-                    ? <EditDatabase />
-                    : null
-                  }
-                  <button type="button" className="btn btn-primary mb-2" onClick={() => setEdit(!openEdit)}>
-                    {!openEdit ? "Open Edit" : "Close Edit"}
-                  </button>
+                  <Link to="/editDatabase" className="btn btn-primary mb-2" >Open Edit</Link>
                 </div>
               : null
             }

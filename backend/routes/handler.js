@@ -459,7 +459,8 @@ router.get('/getDB_UserRows', async (req, res) => {
     if (err) console.log(err);
 
     try {
-      const getUserRows = `SELECT Username, User_Password, (Username = Mod_Username) AS Is_Moderator FROM DB_User, Moderator`;
+      const getUserRows = `SELECT Username, User_Password, IFNULL((Username = Mod_Username), 0) AS Is_Moderator
+        FROM DB_User LEFT OUTER JOIN Moderator ON Username = Mod_Username`;
 
       conn.query(getUserRows, (err, result) => {
         if (err) console.log(err);
@@ -481,7 +482,8 @@ router.get('/getRatingRows', async (req, res) => {
       const getRatingRows = `SELECT R.Movie_ID, M.Title AS Movie_Title, R.Users_Username,
         R.Score, R.Date_Last_Updated, R.Title, R.Rating_Description
       FROM Rating AS R, Movie AS M
-      WHERE R.Movie_ID = M.Movie_ID`;
+      WHERE R.Movie_ID = M.Movie_ID
+      ORDER BY R.Movie_ID ASC, R.Users_Username ASC`;
 
       conn.query(getRatingRows, (err, result) => {
         if (err) console.log(err);
@@ -504,7 +506,7 @@ router.get('/getRatingRows', async (req, res) => {
 // is simply a placeholder to be replaced by the plethora of other connections below.
 router.post('/editDatabaseDefault', async (req, res) => {
   console.log("Nothing was changed, make sure to fill out all fields.", req.body);
-  res.redirect("/account")
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -542,7 +544,7 @@ router.post('/updateTheater', async (req, res) => {
     }
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -561,7 +563,7 @@ router.post('/deleteTheater', async (req, res) => {
     });
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -596,7 +598,7 @@ router.post('/insertTheater', async (req, res) => {
     }
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 // ================================
@@ -646,7 +648,7 @@ router.post('/updateMovie', async (req, res) => {
     conn.release();
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -665,7 +667,7 @@ router.post('/deleteMovie', async (req, res) => {
     });
   });
   
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -697,7 +699,7 @@ router.post('/insertMovie', async (req, res) => {
     conn.release();
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 // ===============================
@@ -735,7 +737,7 @@ router.post('/updateSHOWING_IN', async (req, res) => {
     conn.release();
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -753,7 +755,7 @@ router.post('/deleteSHOWING_IN', async (req, res) => {
     });
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -771,7 +773,7 @@ router.post('/insertSHOWING_IN', async (req, res) => {
     });
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 // ===============================
@@ -808,7 +810,7 @@ router.post('/updateActor_Actress', async (req, res) => {
     }
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -835,7 +837,7 @@ router.post('/deleteActor_Actress', async (req, res) => {
     }
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -862,7 +864,7 @@ router.post('/insertActor_Actress', async (req, res) => {
     });
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 // ===============================
@@ -900,7 +902,7 @@ router.post('/updateDirector', async (req, res) => {
     }
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -927,7 +929,7 @@ router.post('/deleteDirector', async (req, res) => {
     }
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -954,7 +956,7 @@ router.post('/insertDirector', async (req, res) => {
     });
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 // ===============================
@@ -992,7 +994,7 @@ router.post('/updateWORKED_ON', async (req, res) => {
     conn.release();
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -1010,7 +1012,7 @@ router.post('/deleteWORKED_ON', async (req, res) => {
     });
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -1028,7 +1030,7 @@ router.post('/insertWORKED_ON', async (req, res) => {
     });
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 // ===============================
@@ -1052,7 +1054,7 @@ router.post('/updateStudio', async (req, res) => {
     });
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -1071,7 +1073,7 @@ router.post('/deleteStudio', async (req, res) => {
     });
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -1089,7 +1091,7 @@ router.post('/insertStudio', async (req, res) => {
     });
   });
 
-  res.redirect("/account");
+  res.redirect('/editDatabase');
   res.end();
 });
 // ===============================
@@ -1127,7 +1129,7 @@ router.post('/updatePRODUCED_BY', async (req, res) => {
     conn.release();
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -1145,7 +1147,7 @@ router.post('/deletePRODUCED_BY', async (req, res) => {
     });
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 
@@ -1163,7 +1165,7 @@ router.post('/insertPRODUCED_BY', async (req, res) => {
     });
   });
 
-  res.redirect('/account');
+  res.redirect('/editDatabase');
   res.end();
 });
 // ===============================
@@ -1171,9 +1173,201 @@ router.post('/insertPRODUCED_BY', async (req, res) => {
 // ===============================
 // ========== USER EDITS =========
 // ===============================
+router.post('/updateDB_User', async (req, res) => {
+  const origUsername = req.body.origUsername;
+  const newUsername = req.body.newUsername;
+  const newPass = req.body.newPassword;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if (newUsername !== "" && newPass !== "") {
+      const updateUserQry = `UPDATE DB_User SET Username=?, User_Password=? WHERE Username=?`;
+      conn.query(updateUserQry, [newUsername, newPass, origUsername], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Username ${origUsername} reset to ${newUsername} with different password.`);
+      });
+    } else if (newUsername !== "" && newPass === "") {
+      const updateUserQry = `UPDATE DB_User SET Username=? WHERE Username=?`;
+      conn.query(updateUserQry, [newUsername, origUsername], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Username ${origUsername} has been updated to ${newUsername}`);
+      });
+    } else if (newUsername === "" && newPass !== "") {
+      const updateUserQry = `UPDATE DB_User SET User_Password=? WHERE Username=?`;
+      conn.query(updateUserQry, [newPass, origUsername], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`${origUsername} had their password reset.`);
+      });
+    }    
+
+    if (req.body.makeMod === "on") {
+      const updateModQry = `INSERT INTO Moderator VALUES (?)`;
+      if (newUsername !== "") {
+        conn.query(updateModQry, [newUsername], (err, result) => {
+          if (err) console.log(err);
+          else console.log(`${origUsername} updated to ${newUsername} is now a moderator.`);
+        });
+      } else {
+        conn.query(updateModQry, [origUsername], (err, result) => {
+          if (err) console.log(err);
+          else console.log(`${origUsername} is now a moderator.`);
+        });
+      }
+    }
+    conn.release();
+  });
+
+  res.redirect('/editDatabase');
+  res.end();
+});
+
+router.post('/deleteDB_User', async (req, res) => {
+  const userToRemove = req.body.usernameToDelete;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if(req.body.deleteMod === "on") {
+      const deleteModQry = `DELETE FROM Moderator WHERE Mod_Username=?`
+      conn.query(deleteModQry, [userToRemove], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`${userToRemove} has had their mod privileges successfully taken away.`);
+      });
+    } else {
+      const deleteUserQry = `DELETE FROM DB_User Where Username=?`;
+      conn.query(deleteUserQry, [userToRemove], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`User ${userToRemove} has been removed successfully.`);
+      });
+    }
+    conn.release();    
+  });
+
+  res.redirect('/editDatabase');
+  res.end();
+});
+
+router.post('/insertDB_User', async (req, res) => {
+  const userToAdd = req.body.usernameToAdd;
+  const passToAdd = req.body.passwordToAdd;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const userInsertQry = `INSERT INTO DB_User VALUES(?, ?)`;
+
+    conn.query(userInsertQry, [userToAdd, passToAdd], (err, result) => {
+      if (err) console.log(err);
+      else console.log(`User ${userToAdd} has been successfully added.`);
+    });
+
+    if (req.body.makeMod === "on") {
+      const makeModeQry = `INSERT INTO Moderator VALUES (?)`;
+      conn.query(makeModeQry, [userToAdd], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`${userToAdd} has successfully been made into a moderator.`);
+      });
+    }
+  });
+
+  res.redirect('/editDatabase');
+  res.end();
+});
+// ===============================
 
 // ===============================
 // ======== RATING EDITS =========
 // ===============================
+router.post('/updateRating', async (req, res) => {
+  const origUsername = req.body.origUser;
+  const origMovieID = req.body.origMovie;
+
+  const updatedUsername = req.body.updatedUser;
+  const updatedMovieID = req.body.updatedMovie;
+
+  const updatedScore = req.body.updatedScore;
+  const updatedTitle = req.body.updatedTitle;
+  const updatedDesc = req.body.updatedDescription;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if (req.body.updateRatingContent === "on") {
+      const ratingContentUpdateQry = `UPDATE Rating SET Score=?, Title=?, Rating_Description=? WHERE Users_Username=? AND Movie_ID=?`;
+      conn.query(ratingContentUpdateQry, [updatedScore, updatedTitle, updatedDesc, origUsername, origMovieID], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Rating contents from user ${origUsername} for Movie ID #${origMovieID} has been updated.`);
+      });
+    }
+
+    const updateRatingQry = `UPDATE Rating SET Users_Username=?, Movie_ID=? WHERE Users_Username=? AND Movie_ID=?`;
+
+    if (updatedUsername !== "" && updatedMovieID !== "") {
+      conn.query(updateRatingQry, [updatedUsername, updatedMovieID, origUsername, origMovieID], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Rating written by ${origUsername} for Movie ID #${origMovieID} is now written 
+          by ${updatedUsername} for Movie ID #${updatedMovieID}.`);
+      });
+    } else if (updatedUsername !== "" && updatedMovieID === "") {
+      conn.query(updateRatingQry, [updatedUsername, origMovieID, origUsername, origMovieID], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Rating for Movie ID #${origMovieID} is now written by ${updatedUsername}.`);
+      });
+    } else if (updatedUsername === "" && updatedMovieID !== "") {
+      conn.query(updateRatingQry, [origUsername, updatedMovieID, origUsername, origMovieID], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Rating written by ${origUsername} for Movie ID #${origMovieID} is 
+          now written for Movie ID#${updatedMovieID}.`);
+      });
+    }
+    conn.release();
+  });
+
+  res.redirect('/editDatabase');
+  res.end();
+});
+
+router.post('/deleteRating', async (req, res) => {
+  const usernameToDelete = req.body.authorToDelete;
+  const movieToDelete = req.body.ratedMovieToDelete;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const deleteRatingQry = `DELETE FROM Rating WHERE Users_Username=? AND Movie_ID=?`;
+
+    conn.query(deleteRatingQry, [usernameToDelete, movieToDelete], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Rating written by ${usernameToDelete} for Movie ID #${movieToDelete} has been removed.`);
+    });
+  });
+
+  res.redirect('/editDatabase');
+  res.end();
+});
+
+router.post('/insertRating', async (req, res) => {
+  const userToAdd = req.body.authorToAdd;
+  const movieToRate = req.body.movieToRate;
+  const ratingScore = req.body.score;
+  const ratingTitle = req.body.title;
+  const ratingDesc = req.body.description;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const insertRatingQry = `INSERT INTO Rating(Movie_ID, Users_Username, Score, Title, Rating_Description) VALUES (?, ?, ?, ?, ?)`;
+    conn.query(insertRatingQry, [movieToRate, userToAdd, ratingScore, ratingTitle, ratingDesc], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Rating for Movie ID #${movieToRate} written by ${userToAdd} has been added.`);
+    });
+  });
+
+  res.redirect('/editDatabase');
+  res.end();
+});
+// ==============================
 
 module.exports = router;

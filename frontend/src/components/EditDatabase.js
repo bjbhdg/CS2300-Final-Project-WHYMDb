@@ -1,5 +1,6 @@
 import React from 'react';
 import ShowRelationData from './ShowRelationData';
+import {Link} from 'react-router-dom';
 
 const resetDBUpdateType = {
   updateDBChosen: false,
@@ -160,67 +161,62 @@ class EditDatabase extends React.Component {
 
     return (
       <div style={{ marginTop: "5px" }}>
+        <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
         { this.state.updateDBChosen
           ? <div>
-              <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
-                <tbody>
-                  <tr>
-                    <td><label>Pre-Existing Location:</label></td>
-                    <td><input type="text" name="preExistTheater" placeholder="Theater Address" className="form-control" /></td>
-                  </tr>
-                  <tr>
-                    <td><label>Updated Location:</label></td>
-                    <td>
-                      <input type="text" name="theaterLocation" placeholder="Updated Address (If Applicable)"
-                        className="form-control"
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><label>Updated Owner:</label></td>
-                    <td><input type="text" name="newOwner" placeholder="Owner" className="form-control" /></td>
-                  </tr>
-                  <tr>
-                    <td><label>Just Editing Operating Hours?</label></td>
-                    <td>
-                      <input id="opHourEditEnable" type="checkbox" name="opHourEditEnable"
-                        onChange={() => this.setState({ toggleOpHourEdit: !this.state.toggleOpHourEdit })}
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
-                { this.state.toggleOpHourEdit
-                  ? <tbody>
-                      <tr>
-                        <td><label>Day of the Week</label></td>
-                        <td><select id="dayOfWeek" name="dayOfWeek">{dayOfWeekDDMEntries}</select></td>
-                      </tr>
-                      <tr>
-                        <td><label>Opening Time:</label></td>
-                        <td><input type="time" name="openingTime" className="form-control" style={{ width: "auto" }} /></td>
-                      </tr>
-                      <tr>
-                        <td><label>Closing Time:</label></td>
-                        <td><input type="time" name="closingTime" className="form-control" style={{ width: "auto" }} /></td>
-                      </tr>
-                    </tbody>
+              <tbody>
+                <tr>
+                  <td><label>Pre-Existing Location:</label></td>
+                  <td><input type="text" name="preExistTheater" placeholder="Theater Address" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Updated Location:</label></td>
+                  <td>
+                    <input type="text" name="theaterLocation" placeholder="Updated Address (If Applicable)"
+                      className="form-control"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td><label>Updated Owner:</label></td>
+                  <td><input type="text" name="newOwner" placeholder="Owner" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Just Editing Operating Hours?</label></td>
+                  <td>
+                    <input id="opHourEditEnable" type="checkbox" name="opHourEditEnable"
+                      onChange={() => this.setState({ toggleOpHourEdit: !this.state.toggleOpHourEdit })}
+                    />
+                  </td>
+                </tr>
+              </tbody>
+              { this.state.toggleOpHourEdit
+                ? <tbody>
+                    <tr>
+                      <td><label>Day of the Week</label></td>
+                      <td><select id="dayOfWeek" name="dayOfWeek">{dayOfWeekDDMEntries}</select></td>
+                    </tr>
+                    <tr>
+                      <td><label>Opening Time:</label></td>
+                      <td><input type="time" name="openingTime" className="form-control" style={{ width: "auto" }} /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Closing Time:</label></td>
+                      <td><input type="time" name="closingTime" className="form-control" style={{ width: "auto" }} /></td>
+                    </tr>
+                  </tbody>
                 : null
               }
-              </table>
             </div>
           : this.state.deleteDBChosen
-            ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
-                <tbody>
-                  <tr>
-                    <td><label>Location:</label></td>
-                    <td><input type="text" name="theaterLocation" placeholder="Theater Address" className="form-control" /></td>
-                  </tr>
-                </tbody>
-              </table>
+            ? <tbody>
+                <tr>
+                  <td><label>Location:</label></td>
+                  <td><input type="text" name="theaterLocation" placeholder="Theater Address" className="form-control" /></td>
+                </tr>
+              </tbody>
             : this.state.insertDBChosen
-              ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+              ? <div>
                   <tbody>
                     <tr>
                       <td><label>Location:</label></td>
@@ -262,9 +258,10 @@ class EditDatabase extends React.Component {
                       </tbody>
                     : null
                   }
-                </table>
-              : null
+                </div>
+          : null
         }
+        </table>
       </div>
     );
   }
@@ -627,9 +624,148 @@ class EditDatabase extends React.Component {
     );
   }
 
+  renderDBUserEdit() {
+    return (
+      <div>
+        <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+        { this.state.updateDBChosen
+          ? <tbody>
+              <tr>
+                <td><label>Pre-Existing Username</label></td>
+                <td><input type="text" name="origUsername" placeholder="Username (Required)" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>New Username:</label></td>
+                <td><input type="text" name="newUsername" placeholder="Username (Optional)" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>New Password:</label></td>
+                <td><input type="text" name="newPassword" placeholder="Password (Optional)" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>Make Moderator?</label></td>
+                <td><input type="checkbox" name="makeMod" /></td>
+              </tr>
+            </tbody>
+          : this.state.deleteDBChosen
+            ? <tbody>
+                <tr>
+                  <td><label>Username:</label></td>
+                  <td><input type="text" name="usernameToDelete" placeholder="Username (Required)" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Only Strip Mod Privileges?</label></td>
+                  <td><input type="checkbox" name="deleteMod" /></td>
+                </tr>
+              </tbody>
+            : this.state.insertDBChosen
+              ? <tbody>
+                  <tr>
+                    <td><label>Username:</label></td>
+                    <td><input type="text" name="usernameToAdd" placeholder="Name" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Password:</label></td>
+                    <td><input type="text" name="passwordToAdd" placeholder="Password" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Is Moderator?</label></td>
+                    <td><input type="checkbox" name="makeMod" /></td>
+                  </tr>
+                </tbody>
+              : null
+        }
+        </table>
+      </div>
+    );
+  }
+
+  renderRatingEdit() {
+    return (
+      <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+        { this.state.updateDBChosen
+          ? <tbody>
+              <tr>
+                <td><label>Existing Username:</label></td>
+                <td><input type="text" name="origUser" placeholder="Username (Required)" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>Existing Movie ID:</label></td>
+                <td><input type="number" name="origMovie" placeholder="Movie ID (Required)" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>Updated Rating Author:</label></td>
+                <td><input type="text" name="updatedUser" placeholder="Username (Optional)" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>Updated Rated Movie:</label></td>
+                <td><input type="number" name="updatedMovie" placeholder="Movie ID (Optional)" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>Update Rating Content (If so, empty fields below will be treated as input)?</label></td>
+                <td><input type="checkbox" name="updateRatingContent" /></td>
+              </tr>
+              <tr>
+                <td><label>Updated Score:</label></td>
+                <td><input type="number" name="updatedScore" placeholder="Out of 10" min={0} max={10} className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>Updated Rating Title:</label></td>
+                <td><input type="text" name="updatedTitle" placeholder="Rating Title" className="form-control" /></td>
+              </tr>
+              <tr>
+                <td><label>Updated Rating Description:</label></td>
+                <td><input type="text" name="updatedDescription" placeholder="Description" className="form-control" /></td>
+              </tr>
+            </tbody>
+          : this.state.deleteDBChosen
+            ? <tbody>
+                <tr>
+                  <td><label>Username:</label></td>
+                  <td><input type="text" name="authorToDelete" placeholder="Username (Required)" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Movie ID:</label></td>
+                  <td><input type="number" name="ratedMovieToDelete" placeholder="Movie ID (Required" className="form-control" /></td>
+                </tr>
+              </tbody>
+            : this.state.insertDBChosen
+              ? <tbody>
+                  <tr>
+                    <td><label>Rating Author:</label></td>
+                    <td><input type="text" name="authorToAdd" placeholder="Username (Required)" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Movie To Rate:</label></td>
+                    <td><input type="number" name="movieToRate" placeholder="Movie ID (Required)" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Score:</label></td>
+                    <td>
+                      <input type="number" name="score" placeholder="Out of 10 (Required)"
+                        min={0} max={10} className="form-control"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label>Rating Title:</label></td>
+                    <td><input type="text" name="title" placeholder="(Can be empty)" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Rating Description:</label></td>
+                    <td><input type="text" name="description" placeholder="(Can be empty)" className="form-control" /></td>
+                  </tr>
+                </tbody>
+              : null
+        }
+      </table>
+    );
+  }
+
   render() {
     return (
       <div style={{ marginLeft: "auto", marginRight: "auto" }}>
+        <h1 className="mt-5">WHYMDb</h1>
         <h2 className="mt-3">Edit Database:</h2>
         <div>
           <form id="alterDatabase" method="POST" action='/editDatabaseDefault'>
@@ -698,6 +834,7 @@ class EditDatabase extends React.Component {
               </option>
 
             </select><br/>
+
             <div>
               <label>{`Show Existing Entries in the ${this.state.currChosenRelation} Relation?`}</label>
               <input type="checkbox" checked={this.state.showRelationRows} style={{ marginLeft: "5px" }}
@@ -717,9 +854,12 @@ class EditDatabase extends React.Component {
               { this.state.workedOnChosen ? this.renderWorkedOnEdit() : null }
               { this.state.studioChosen ? this.renderStudioEdit() : null }
               { this.state.producedByChosen ? this.renderProducedByEdit() : null }
+              { this.state.dbUserChosen ? this.renderDBUserEdit() : null }
+              { this.state.ratingChosen ? this.renderRatingEdit() : null }
             </div>
             <input type="submit" className="btn btn-primary mb-2" value="Submit Changes" style={{ marginTop: "5px" }} />
           </form>
+          <Link to="/account" className="btn btn-primary mb-2">Return to Account</Link>
         </div>
       </div>
     );

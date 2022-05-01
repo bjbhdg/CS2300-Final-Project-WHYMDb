@@ -2,7 +2,6 @@ import React from 'react';
 
 class ShowRelationData extends React.Component {
   constructor(props) {
-    console.log("Props:", props);
     super(props);
 
     this.state = {
