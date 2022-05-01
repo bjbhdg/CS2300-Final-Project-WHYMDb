@@ -6,7 +6,8 @@ const resetDBUpdateType = {
   deleteDBChosen: false,
   insertDBChosen: false,
 
-  toggleOpHourEdit: false
+  toggleOpHourEdit: false,
+  toggleGenreEdit: false
 }
 
 const resetDropDownMenu = {
@@ -21,6 +22,7 @@ const resetDropDownMenu = {
   ratingChosen: false,
 
   toggleOpHourEdit: false,
+  toggleGenreEdit: false,
   showRelationRows: false
 };
 
@@ -44,6 +46,7 @@ class EditDatabase extends React.Component {
 
       disableRelationChoice: true,
       toggleOpHourEdit: false,
+      toggleGenreEdit: false,
 
       currChosenRelation: "Default",
       showRelationRows: false
@@ -266,6 +269,87 @@ class EditDatabase extends React.Component {
     );
   }
 
+  renderMovieEdit() {
+    return (
+      <div>
+        { this.state.updateDBChosen
+          ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+              <tbody>
+                <tr>
+                  <td><label>Existing Movie ID:</label></td>
+                  <td><input type="number" name="preExistID" placeholder="Film ID" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>New Title:</label></td>
+                  <td>
+                    <input type="text" name="newTitle" placeholder="New Title (If Applicable)"
+                      className="form-control"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td><label>Updated Release Date:</label></td>
+                  <td><input type="date" name="newDate" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Update Genre:</label></td>
+                  <td><input type="text" name="genres" placeholder="genreToUpdate, newGenre" className="form-control" /></td>
+                </tr>
+              </tbody>
+            </table>
+          : this.state.deleteDBChosen
+            ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                <tbody>
+                  <tr>
+                    <td><label>Movie ID:</label></td>
+                    <td><input type="number" name="movieIDToDelete" placeholder="ID To Delete" className="form-control" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            : this.state.insertDBChosen
+              ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                  <tbody>
+                    <tr>
+                      <td><label>Movie Title:</label></td>
+                      <td><input type="text" name="titleToAdd" placeholder="Title" className="form-control" /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Release Date:</label></td>
+                      <td><input type="date" name="releaseDate" className="form-control" /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Want to Insert Genres?</label></td>
+                      <td>
+                      <input id="genreInsertEnable" type="checkbox" name="genreInsertEnable"
+                        onChange={() => this.setState({ toggleGenreEdit: !this.state.toggleGenreEdit })}
+                      />
+                      </td>
+                    </tr>
+                  </tbody>
+                  { this.state.toggleGenreEdit
+                    ? <tbody>
+                        <tr>
+                          <td><label>Pre-Existing ID:</label></td>
+                          <td><input type="text" name="preExistingMovieID" placeholder="Movie ID" className="form-control" /></td>
+                        </tr>
+                        <tr>
+                          <td><label>Genres:</label></td>
+                          <td>
+                            <input type="text" defaultValue="" name="genres"
+                              placeholder="Genre1, Genre2, ..." className="form-control"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    : null
+                  }
+                </table>
+              : null
+        }
+      </div>
+    );
+  }
+
   renderFilmWorkerEdit() {
     return (
       <div style={{ marginTop: "5px" }}>
@@ -339,6 +423,118 @@ class EditDatabase extends React.Component {
           }
       </div>
     )
+  }
+
+  renderShowingInEdit() {
+    return (
+      <div>
+        { this.state.updateDBChosen
+          ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+              <tbody>
+                <tr>
+                  <td><label>Pre-Existing Movie ID:</label></td>
+                  <td><input type="number" name="origMovieID" placeholder="Movie ID (Required)" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Pre-Existing Theater Location:</label></td>
+                  <td><input type="text" name="origTheaterLocation" placeholder="Address (Required)" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Updated Movie ID:</label></td>
+                  <td><input type="number" name="newMovieID" placeholder="Movie ID" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Updated Theater Location:</label></td>
+                  <td><input type="text" name="newTheaterLocation" placeholder="Address" className="form-control" /></td>
+                </tr>
+              </tbody>
+            </table>
+          : this.state.deleteDBChosen
+            ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                <tbody>
+                  <tr>
+                    <td><label>Movie ID:</label></td>
+                    <td><input type="number" name="movieIDToDelete" placeholder="Movie ID (Required)" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Theater Location:</label></td>
+                    <td><input type="text" name="theaterToDelete" placeholder="Address (Required)" className="form-control" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            : this.state.insertDBChosen
+              ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                  <tbody>
+                    <tr>
+                      <td><label>Movie ID:</label></td>
+                      <td><input type="number" name="movieToAdd" placeholder="Movie ID (Required)" className="form-control" /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Theater Location:</label></td>
+                      <td><input type="text" name="theaterToAdd" placeholder="Address (Required)" className="form-control" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              : null
+        }
+      </div>
+    );
+  }
+
+  renderWorkedOnEdit() {
+    return (
+      <div>
+        { this.state.updateDBChosen
+          ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+              <tbody>
+                <tr>
+                  <td><label>Pre-Existing Movie ID:</label></td>
+                  <td><input type="number" name="origMovieID" placeholder="Movie ID (Required)" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Pre-Existing Film Worker ID:</label></td>
+                  <td><input type="text" name="origFWorker" placeholder="Film Worker ID (Required)" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Updated Movie ID:</label></td>
+                  <td><input type="number" name="newMovieID" placeholder="Movie ID" className="form-control" /></td>
+                </tr>
+                <tr>
+                  <td><label>Updated Film Worker ID:</label></td>
+                  <td><input type="text" name="newFWorker" placeholder="Film Worker ID" className="form-control" /></td>
+                </tr>
+              </tbody>
+        </table>
+          : this.state.deleteDBChosen
+            ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                <tbody>
+                  <tr>
+                    <td><label>Movie ID:</label></td>
+                    <td><input type="number" name="movieIDToDelete" placeholder="Movie ID (Required)" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Film Worker ID:</label></td>
+                    <td><input type="text" name="fWToDelete" placeholder="Film Worker ID (Required)" className="form-control" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            : this.state.insertDBChosen
+              ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                  <tbody>
+                    <tr>
+                      <td><label>Movie ID:</label></td>
+                      <td><input type="number" name="movieToAdd" placeholder="Movie ID (Required)" className="form-control" /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Film Worker ID:</label></td>
+                      <td><input type="text" name="fWToAdd" placeholder="Film Worker ID (Required)" className="form-control" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              : null
+        }
+      </div>
+    );
   }
 
   render() {
@@ -424,8 +620,11 @@ class EditDatabase extends React.Component {
             </div>
             <p>Use the Fields Below to Alter the Database:</p>
             <div>
-              { this.state.theaterChosen ? this.renderTheaterEdit() : null}
-              { this.state.filmWorkerChosen ? this.renderFilmWorkerEdit() : null}
+              { this.state.theaterChosen ? this.renderTheaterEdit() : null }
+              { this.state.filmWorkerChosen ? this.renderFilmWorkerEdit() : null }
+              { this.state.movieChosen ? this.renderMovieEdit() : null }
+              { this.state.showingInChosen ? this.renderShowingInEdit() : null }
+              { this.state.workedOnChosen ? this.renderWorkedOnEdit() : null }
             </div>
             <input type="submit" className="btn btn-primary mb-2" value="Submit Changes" style={{ marginTop: "5px" }} />
           </form>

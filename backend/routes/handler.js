@@ -300,8 +300,12 @@ router.post('/deleteAccount', async (req, res) => {
   res.end();
 });
 
+// ================================================
+// ====== GET RELATION CONTENTS CONNECTIONS =======
+// ================================================
+
 // Below is an array of 'get' functions that will retrieve the data currently inside each relation.
-// Only moderators will be able to access these.
+// Only moderators will be able to see these get accessed.
 router.get('/getTheaterRows', async (req, res) => {
   pool.getConnection( (err, conn) => {
     if (err) console.log(err);
@@ -309,7 +313,7 @@ router.get('/getTheaterRows', async (req, res) => {
       const getTheaterRows = `
         SELECT T.Location, T.Theater_Owner, O.Day_Of_Operation, O.Opening_Time, O.Closing_Time
         FROM Theater AS T
-        INNER JOIN Theater_Operating_Hours AS O
+        LEFT OUTER JOIN Theater_Operating_Hours AS O
           ON T.Location = O.Theater_Location
         `;
 
@@ -330,8 +334,8 @@ router.get('/getMovieRows', async (req, res) => {
   pool.getConnection( (err, conn) => {
     if (err) console.log(err);
     try {
-      const getMovieRows = `SELECT M.Movie_ID, M.Title, M.Release_Date, GROUP_CONCAT(G.Genre SEPARATOR ', ') AS Genre
-        FROM Movie AS M INNER JOIN Movie_Genres AS G ON M.Movie_ID = G.Movie_ID GROUP BY M.Movie_ID`;
+      const getMovieRows = `SELECT M.Movie_ID, M.Title, M.Release_Date, GROUP_CONCAT(DISTINCT G.Genre SEPARATOR ', ') AS Genre
+        FROM Movie AS M LEFT OUTER JOIN Movie_Genres AS G ON M.Movie_ID = G.Movie_ID GROUP BY M.Movie_ID`;
       conn.query(getMovieRows, (err, result) => {
         if (err) console.log(err);
         res.send(JSON.stringify(result));
@@ -350,7 +354,8 @@ router.get('/getSHOWING_INRows', async (req, res) => {
     try {
       const getShowingInRows = `SELECT M.Movie_ID, M.Title, S.Theater_Location
         FROM SHOWING_IN AS S INNER JOIN Movie AS M, Theater AS T
-        WHERE M.Movie_ID = S.Movie_ID AND T.Location = S.Theater_Location`;
+        WHERE M.Movie_ID = S.Movie_ID AND T.Location = S.Theater_Location
+        ORDER BY M.Movie_ID ASC`;
 
       conn.query(getShowingInRows, (err, result) => {
         if (err) console.log(err);
@@ -394,7 +399,8 @@ router.get('/getWORKED_ONRows', async (req, res) => {
 
       const getWorkedOnRows = `SELECT W.Film_Worker_ID, F.First_Name, F.Last_Name, W.Movie_ID, M.Title
         FROM WORKED_ON AS W, Film_Workers AS F, Movie AS M
-        WHERE W.Film_Worker_ID = F.Film_Worker_ID AND W.Movie_ID = M.Movie_ID`;
+        WHERE W.Film_Worker_ID = F.Film_Worker_ID AND W.Movie_ID = M.Movie_ID
+        ORDER BY W.Movie_ID ASC, W.Film_Worker_ID ASC`;
 
       conn.query(getWorkedOnRows, (err, result) => {
         if (err) console.log(err);
@@ -487,10 +493,11 @@ router.get('/getRatingRows', async (req, res) => {
     }
   });
 });
+// ================================================
 
-// ================================
-// =====   EDIT CONNECTIONS   =====
-// ================================
+// ================================================
+// ============   EDIT CONNECTIONS   ==============
+// ================================================
 
 // This is the DEFAULT route that the edit function will be sent to. It does not actually do anything, it
 // is simply a placeholder to be replaced by the plethora of other connections below.
@@ -500,8 +507,10 @@ router.post('/editDatabaseDefault', async (req, res) => {
   res.end();
 });
 
-router.post('/updateTheater', async(req, res) => {
-  console.log("Theat req", req.body);
+// ================================
+// ======== THEATER EDITS =========
+// ================================
+router.post('/updateTheater', async (req, res) => {
   const theatLoc = (req.body.theaterLocation !== "" ? req.body.theaterLocation : req.body.preExistTheater);
   const existingTheater = req.body.preExistTheater;
   const newOwner = req.body.newOwner;
@@ -536,7 +545,7 @@ router.post('/updateTheater', async(req, res) => {
   res.end();
 });
 
-router.post('/deleteTheater', async(req, res) => {
+router.post('/deleteTheater', async (req, res) => {
   const theatLoc = req.body.theaterLocation;
 
   pool.getConnection( (err, conn) => {
@@ -555,7 +564,7 @@ router.post('/deleteTheater', async(req, res) => {
   res.end();
 });
 
-router.post('/insertTheater', async(req, res) => {
+router.post('/insertTheater', async (req, res) => {
   const newTheat = req.body.theaterLocation;
   const owner = req.body.theaterOwner;
 
@@ -589,8 +598,187 @@ router.post('/insertTheater', async(req, res) => {
   res.redirect('/account');
   res.end();
 });
+// ================================
 
-router.post('/updateActor_Actress', async(req, res) => {
+// ================================
+// ========= MOVIE EDITS ==========
+// ================================
+router.post('/updateMovie', async (req, res) => {
+  const currMovieID = req.body.preExistID;
+  const newTitle = req.body.newTitle;
+  const newReleaseDate = req.body.newDate;
+  const genres = (req.body.genres === "" ? "" : req.body.genres.split(', '));
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if (newTitle !== "" && newReleaseDate !== "") {
+      const updateQuery = `UPDATE Movie SET Title=?, Release_Date=? WHERE Movie_ID=?`;
+      conn.query(updateQuery, [newTitle, newReleaseDate, currMovieID], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Movie ID #${currMovieID} Title and Release Data updated.`);
+      });
+    }
+    else if (newTitle !== "" && newReleaseDate === "") {
+      const updateQuery = `UPDATE Movie SET Title=? WHERE Movie_ID=?`;
+      conn.query(updateQuery, [newTitle, currMovieID], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Movie ID #${currMovieID}'s title updated.`);
+      });
+    }
+    else if (newTitle === "" && newReleaseDate !== "") {
+      const updateQuery = `UPDATE Movie SET Release_Date=? WHERE Movie_ID=?`;
+      conn.query(updateQuery, [newReleaseDate, currMovieID], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Movie ID #${currMovieID}'s release date updated.`);
+      });
+    }
+
+    if(genres !== "" && genres.length === 2) {
+      const updateGenres = `UPDATE Movie_Genres SET Genre=? WHERE Movie_ID=? AND Genre=?`
+      conn.query(updateGenres, [genres[1], currMovieID, genres[0]], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`${genres[0]} updated to ${genres[1]} for Movie ID #${currMovieID}`);
+      });
+    }
+
+    conn.release();
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/deleteMovie', async (req, res) => {
+  const movieIDToDelete = req.body.movieIDToDelete;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const deleteQuery = `DELETE FROM Movie WHERE Movie_ID = ?`;
+
+    conn.query(deleteQuery, [movieIDToDelete], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Movie ID #${movieIDToDelete} successfully deleted.`);
+    });
+  });
+  
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/insertMovie', async (req, res) => {
+  const movieTitleToAdd = req.body.titleToAdd;
+  const releaseDate = req.body.releaseDate;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if (req.body.genreInsertEnable === "on" && req.body.genres !== "") {
+      const preExistMovieID = req.body.preExistingMovieID;
+      const genres = req.body.genres.split(', ');
+
+      const genreInsertQry = `INSERT INTO Movie_Genres VALUES(?, ?)`;
+      genres.forEach((genre) => {
+        conn.query(genreInsertQry, [preExistMovieID, genre], (err, result) => {
+          if (err) console.log(err);
+          else console.log(`Genre ${genre} added for Movie ID #${preExistMovieID}.`);
+        });
+      });
+    } else {
+      const movieInsertQry = `INSERT INTO Movie(Title, Release_Date) VALUES (?, ?)`;
+      conn.query(movieInsertQry, [movieTitleToAdd, releaseDate], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`${movieTitleToAdd} successfully added as a movie.`);
+      });
+    }
+    conn.release();
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+// ===============================
+
+// ===============================
+// ====== SHOWING IN EDITS =======
+// ===============================
+router.post('/updateSHOWING_IN', async (req, res) => {
+  const originalMovie = req.body.origMovieID;
+  const originalTheatLoc = req.body.origTheaterLocation;
+  const newMovie = req.body.newMovieID;
+  const newTheatLoc = req.body.newTheaterLocation;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const updateQry = `UPDATE SHOWING_IN SET Movie_ID=?, Theater_Location=? WHERE Movie_ID=? AND Theater_Location=?`;
+
+    if (newMovie !== "" && newTheatLoc !== "") {
+      conn.query(updateQry, [newMovie, newTheatLoc, originalMovie, originalTheatLoc], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Showing In For Movie ID #${originalMovie} at ${originalTheatLoc} successfully updated.`);
+      });
+    } else if (newMovie !== "" && newTheatLoc === "") {
+      conn.query(updateQry, [newMovie, originalTheatLoc, originalMovie, originalTheatLoc], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Showing In For Movie ID #${originalMovie} at ${originalTheatLoc} successfully updated.`);
+      });
+    } else if (newMovie === "" && newTheatLoc !== "") {
+      conn.query(updateQry, [originalMovie, newTheatLoc, originalMovie, originalTheatLoc], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Showing In For Movie ID #${originalMovie} at ${originalTheatLoc} successfully updated.`);
+      })
+    }
+    conn.release();
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/deleteSHOWING_IN', async (req, res) => {
+  const movieToDelete = req.body.movieIDToDelete;
+  const theatToDelete = req.body.theaterToDelete;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const deleteQry = `DELETE FROM SHOWING_IN WHERE Movie_ID=? AND Theater_Location=?`
+    conn.query(deleteQry, [movieToDelete, theatToDelete], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Movie ID #${movieToDelete} showing in ${theatToDelete} has been successfully deleted.`);
+    });
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/insertSHOWING_IN', async (req, res) => {
+  const movieToAdd = req.body.movieToAdd;
+  const theatToAdd = req.body.theaterToAdd;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const insertQry = `INSERT INTO SHOWING_IN VALUES(?, ?)`;
+    conn.query(insertQry, [theatToAdd, movieToAdd], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`New Showing added for Movie ID #${movieToAdd} at ${theatToAdd}.`);
+    });
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+// ===============================
+
+// ===============================
+// ===== ACTOR/ACTRESS EDITS =====
+// ===============================
+router.post('/updateActor_Actress', async (req, res) => {
   const idToUpdate = req.body.filmWorkerID;
   const updateToActorActress = req.body.specifyFWType;
   const newFName = req.body.newFirstName;
@@ -676,8 +864,12 @@ router.post('/insertActor_Actress', async (req, res) => {
   res.redirect("/account");
   res.end();
 });
+// ===============================
 
-router.post('/updateDirector', async(req, res) => {
+// ===============================
+// ======== DIRECTOR EDITS =======
+// ===============================
+router.post('/updateDirector', async (req, res) => {
   const idToUpdate = req.body.filmWorkerID;
   const updateToDirector = req.body.specifyFWType;
   const newFName = req.body.newFirstName;
@@ -764,5 +956,80 @@ router.post('/insertDirector', async (req, res) => {
   res.redirect("/account");
   res.end();
 });
+// ===============================
+
+// ===============================
+// ======== WORKED_ON EDITS ======
+// ===============================
+router.post('/updateWORKED_ON', async (req, res) => {
+  const originalMovie = req.body.origMovieID;
+  const originalFilmWorker = req.body.origFWorker;
+  const newMovie = req.body.newMovieID;
+  const newFilmWorker = req.body.newFWorker;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const updateQry = `UPDATE WORKED_ON SET Movie_ID=?, Film_Worker_ID=? WHERE Movie_ID=? AND Film_Worker_ID=?`;
+
+    if (newMovie !== "" && newFilmWorker !== "") {
+      conn.query(updateQry, [newMovie, newFilmWorker, originalMovie, originalFilmWorker], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Worked On For Movie ID #${originalMovie} with ${originalFilmWorker} successfully updated.`);
+      });
+    } else if (newMovie !== "" && newFilmWorker === "") {
+      conn.query(updateQry, [newMovie, originalFilmWorker, originalMovie, originalFilmWorker], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Worked On For Movie ID #${originalMovie} with ${originalFilmWorker} successfully updated.`);
+      });
+    } else if (newMovie === "" && newFilmWorker !== "") {
+      conn.query(updateQry, [originalMovie, newFilmWorker, originalMovie, originalFilmWorker], (err, result) => {
+        if (err) console.log(err);
+        else console.log(`Worked On For Movie ID #${originalMovie} with ${originalFilmWorker} successfully updated.`);
+      })
+    }
+    conn.release();
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/deleteWORKED_ON', async (req, res) => {
+  const movieToDelete = req.body.movieIDToDelete;
+  const filmWorkerToDelete = req.body.fWToDelete;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const deleteQry = `DELETE FROM WORKED_ON WHERE Movie_ID=? AND Film_Worker_ID=?`
+    conn.query(deleteQry, [movieToDelete, filmWorkerToDelete], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Movie ID #${movieToDelete} worked on by ${filmWorkerToDelete} has been successfully deleted.`);
+    });
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/insertWORKED_ON', async (req, res) => {
+  const movieToAdd = req.body.movieToAdd;
+  const filmWorkerToAdd = req.body.fWToAdd;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    const insertQry = `INSERT INTO WORKED_ON VALUES(?, ?)`;
+    conn.query(insertQry, [movieToAdd, filmWorkerToAdd], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Film worker #${filmWorkerToAdd} has worked on Movie ID #${movieToAdd}.`);
+    });
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+// ===============================
 
 module.exports = router;
