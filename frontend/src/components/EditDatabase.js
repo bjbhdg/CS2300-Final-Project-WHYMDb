@@ -1,13 +1,16 @@
 import React from 'react';
+import ShowRelationData from './ShowRelationData';
 
 const resetDBUpdateType = {
   updateDBChosen: false,
   deleteDBChosen: false,
-  insertDBChosen: false
+  insertDBChosen: false,
+
+  toggleOpHourEdit: false
 }
 
 const resetDropDownMenu = {
-  theaterChose: false,
+  theaterChosen: false,
   movieChosen: false,
   showingInChosen: false,
   filmWorkerChosen: false,
@@ -15,7 +18,10 @@ const resetDropDownMenu = {
   studioChosen: false,
   producedByChosen: false,
   dbUserChosen: false,
-  ratingChosen: false
+  ratingChosen: false,
+
+  toggleOpHourEdit: false,
+  showRelationRows: false
 };
 
 class EditDatabase extends React.Component {
@@ -26,7 +32,7 @@ class EditDatabase extends React.Component {
       deleteDBChosen: false,
       insertDBChosen: false,
 
-      theaterChosen: true,
+      theaterChosen: false,
       movieChosen: false,
       showingInChosen: false,
       filmWorkerChosen: false,
@@ -37,28 +43,30 @@ class EditDatabase extends React.Component {
       ratingChosen: false,
 
       disableRelationChoice: true,
-      chosenRelation: ""
+      toggleOpHourEdit: false,
+
+      currChosenRelation: "Default",
+      showRelationRows: false
     }
 
     this.changeChosenDBEditType = this.changeChosenDBEditType.bind(this);
     this.changeRenderedRelationOption = this.changeRenderedRelationOption.bind(this);
     this.changeRouterURL = this.changeRouterURL.bind(this);
-    this.getPreexistingTuple = this.getPreexistingTuple.bind(this);
   }
 
   changeChosenDBEditType(event) {
-    this.setState({...resetDBUpdateType, disableRelationChoice: false});
+    this.setState({ ...resetDBUpdateType, disableRelationChoice: false});
 
     switch(event.target.value) {
-      case "UPDATE":
+      case "update":
         this.setState({ updateDBChosen: true });
         break;
 
-      case "DELETE":
+      case "delete":
         this.setState({ deleteDBChosen: true });
         break;
 
-      case "INSERT":
+      case "insert":
         this.setState({ insertDBChosen: true });
         break;
 
@@ -68,103 +76,194 @@ class EditDatabase extends React.Component {
   }
 
   changeRenderedRelationOption(event) {
-    this.setState(resetDropDownMenu);
-
     switch(event.target.value) {
       case "Theater":
-        this.setState({ theaterChosen: true });
+        this.setState({ ...resetDropDownMenu, theaterChosen: true });
         break;
 
       case "Movie":
-        this.setState({ movieChosen: true });
+        this.setState({ ...resetDropDownMenu, movieChosen: true });
         break;
 
       case "SHOWING_IN":
-        this.setState({ showingInChosen: true });
+        this.setState({ ...resetDropDownMenu, showingInChosen: true });
         break;
       
-      case "Film_Worker":
-        this.setState({ filmWorkerChosen: true });
+      case "Film_Workers":
+        this.setState({ ...resetDropDownMenu, filmWorkerChosen: true });
         break;
 
       case "WORKED_ON":
-        this.setState({ workedOnChosen: true });
+        this.setState({ ...resetDropDownMenu, workedOnChosen: true });
         break;
 
       case "Studio":
-        this.setState({ studioChosen: true });
+        this.setState({ ...resetDropDownMenu, studioChosen: true });
         break;
 
       case "PRODUCED_BY":
-        this.setState({ producedByChosen: true })
+        this.setState({ ...resetDropDownMenu, producedByChosen: true });
         break;
 
       case "DB_User":
-        this.setState({ dbUserChosen: true });
+        this.setState({ ...resetDropDownMenu, dbUserChosen: true });
         break;
 
       case "Rating":
-        this.setState({ ratingChosen: true })
+        this.setState({ ...resetDropDownMenu, ratingChosen: true });
         break;
 
       default:
-        console.log("How did you even get here? What did you do??? >:(");
+        this.setState({ ...resetDropDownMenu });
     }
 
-    this.getPreexistingTuple(event);
-  }
-
-  getPreexistingTuple(event) {
-    switch(event.target.value) {
-      case "Theater":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      case "Movie":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      case "SHOWING_IN":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-      
-      case "Film_Worker":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      case "WORKED_ON":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      case "Studio":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      case "PRODUCED_BY":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      case "DB_User":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      case "Rating":
-        this.setState({ chosenRelation: event.target.value });
-        break;
-
-      default:
-        console.log("If you managed to get here, run...");
-    }
+    this.setState({ currChosenRelation: event.target.value });
   }
 
   changeRouterURL(event) {
-    if(this.state.deleteDBChosen) {
-      document.getElementById("alterDatabase").action = `delete${event.target.value}`;
-    } else if(this.state.updateDBChosen) {
-      document.getElementById("alterDatabase").action = `update${event.target.value}`;
-    } else if(this.state.insertDBChosen) {
-      document.getElementById("alterDatabase").action = `insert${event.target.value}`;
+    // Grabs the current route that the edit database form will submit data to.
+    const currentRoute = document.getElementById("alterDatabase").attributes.action.value;
+
+    // If the database edit type is switched and we are not at the default route.
+    if(event.target.name === "dbUpdateType" && currentRoute !== "/editDatabaseDefault")
+    {
+      // Change the beginning of the route URL to either "update", "delete", or "insert". The currentRoute.substring(7) grabs the
+      // remaining part of the previous URL. This is used when a user swaps a database edit type while already having a relation selected.
+      document.getElementById("alterDatabase").action = `/${event.target.value}${currentRoute.substring(7)}`;      
+    // The else if statement is called when a user chooses a relation from the drop down list.
+    } else if(event.target.name !== "dbUpdateType") {
+      // Below, the relation name is appended to the end of the routing URL for correct data handling.
+      if(this.state.deleteDBChosen) {
+        document.getElementById("alterDatabase").action = `/delete${event.target.value}`;
+      } else if(this.state.updateDBChosen) {
+        document.getElementById("alterDatabase").action = `/update${event.target.value}`;
+      } else if(this.state.insertDBChosen) {
+        document.getElementById("alterDatabase").action = `/insert${event.target.value}`;
+      }
     }
+
+    // If by any chance the user selectes "-Select Relation-" in the relation drop down menu, then route the database edit form
+    // to the default database edit route. 
+    if(event.target.value === "Default" && event.target.name !== "dbUpdateType") {
+      document.getElementById("alterDatabase").action = `/editDatabaseDefault`
+    }
+  }
+
+  renderTheaterEdit() {
+    const daysOfWeek = ["M", "Tu", "W", "Th", "F", "Sa", "Su"];
+    const dayOfWeekDDMEntries = daysOfWeek.map((day) =>
+      <option key={day} value={day}>{day}</option>
+    )
+
+    return (
+      <div style={{ marginTop: "5px" }}>
+        { this.state.updateDBChosen
+          ? <div>
+              <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                <tbody>
+                  <tr>
+                    <td><label>Pre-Existing Location:</label></td>
+                    <td><input type="text" name="preExistTheater" placeholder="Theater Address" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Updated Location:</label></td>
+                    <td>
+                      <input type="text" name="theaterLocation" placeholder="Updated Address (If Applicable)"
+                        className="form-control"
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label>Updated Owner:</label></td>
+                    <td><input type="text" name="newOwner" placeholder="Owner" className="form-control" /></td>
+                  </tr>
+                  <tr>
+                    <td><label>Just Editing Operating Hours?</label></td>
+                    <td>
+                      <input id="opHourEditEnable" type="checkbox" name="opHourEditEnable"
+                        onChange={() => this.setState({ toggleOpHourEdit: !this.state.toggleOpHourEdit })}
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                { this.state.toggleOpHourEdit
+                  ? <tbody>
+                      <tr>
+                        <td><label>Day of the Week</label></td>
+                        <td><select id="dayOfWeek" name="dayOfWeek">{dayOfWeekDDMEntries}</select></td>
+                      </tr>
+                      <tr>
+                        <td><label>Opening Time:</label></td>
+                        <td><input type="time" name="openingTime" className="form-control" style={{ width: "auto" }} /></td>
+                      </tr>
+                      <tr>
+                        <td><label>Closing Time:</label></td>
+                        <td><input type="time" name="closingTime" className="form-control" style={{ width: "auto" }} /></td>
+                      </tr>
+                    </tbody>
+                : null
+              }
+              </table>
+            </div>
+          : this.state.deleteDBChosen
+            ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                <tbody>
+                  <tr>
+                    <td><label>Location:</label></td>
+                    <td><input type="text" name="theaterLocation" placeholder="Theater Address" className="form-control" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            : this.state.insertDBChosen
+              ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
+                  <tbody>
+                    <tr>
+                      <td><label>Location:</label></td>
+                      <td><input type="text" name="theaterLocation" placeholder="Theater Address" className="form-control" /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Owner:</label></td>
+                      <td><input type="text" name="theaterOwner" placeholder="Owner" className="form-control" /></td>
+                    </tr>
+                    <tr>
+                      <td><label>Just Insert Operating Hours?</label></td>
+                      <td>
+                      <input id="opHourEditEnable" type="checkbox" name="opHourInsertEnable"
+                        onChange={() => this.setState({ toggleOpHourEdit: !this.state.toggleOpHourEdit })}
+                      />
+                      </td>
+                    </tr>
+                  </tbody>
+                  { this.state.toggleOpHourEdit
+                    ? <tbody>
+                        <tr>
+                          <td><label>Pre-Existing Theater:</label></td>
+                          <td>
+                            <input type="text" name="preExistingTheater" placeholder="Theater Address" className="form-control" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><label>Day of the Week</label></td>
+                          <td><select id="dayOfWeek" name="dayOfWeek">{dayOfWeekDDMEntries}</select></td>
+                        </tr>
+                        <tr>
+                          <td><label>Opening Time:</label></td>
+                          <td><input type="time" name="openingTime" className="form-control" style={{ width: "auto" }} /></td>
+                        </tr>
+                        <tr>
+                          <td><label>Closing Time:</label></td>
+                          <td><input type="time" name="closingTime" className="form-control" style={{ width: "auto" }} /></td>
+                        </tr>
+                      </tbody>
+                    : null
+                  }
+                </table>
+              : null
+        }
+      </div>
+    );
   }
 
   renderFilmWorkerEdit() {
@@ -198,11 +297,11 @@ class EditDatabase extends React.Component {
                 </tr>
                 <tr>
                   <td><label>Updated First Name:</label></td>
-                  <td><input type="text" name="newFirstName" placeholder="First Name" className="form-control" /></td>
+                  <td><input type="text" name="newFirstName" placeholder="First Name (Not Needed)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Updated Last Name:</label></td>
-                  <td><input type="text" name="newLastName" placeholder="Last Name" className="form-control" /></td>
+                  <td><input type="text" name="newLastName" placeholder="Last Name (Not Needed)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Make Specified Film Worker Type?</label></td>
@@ -237,8 +336,7 @@ class EditDatabase extends React.Component {
                   </tbody>
                 </table>
               : null
-        }
-
+          }
       </div>
     )
   }
@@ -248,24 +346,24 @@ class EditDatabase extends React.Component {
       <div style={{ marginLeft: "auto", marginRight: "auto" }}>
         <h2 className="mt-3">Edit Database:</h2>
         <div>
-          <form id="alterDatabase" method="POST" action='/editDatabase'>
+          <form id="alterDatabase" method="POST" action='/editDatabaseDefault'>
             <div style={{ display: "inline-flex" }}>
               <p>Action You Will Perform:</p>
               <div>
-                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="update" value="UPDATE"
-                  onClick={event => this.changeChosenDBEditType(event)} 
+                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="update" value="update"
+                  onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}} 
                 />
                 <label style={{ marginLeft: "2px" }} htmlFor="update">Update</label>
               </div>
               <div>
-                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="delete" value="DELETE"
-                  onClick={event => this.changeChosenDBEditType(event)}
+                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="delete" value="delete"
+                  onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}}
                 />
                 <label style={{ marginLeft: "2px" }} htmlFor="delete">Delete</label>
               </div>
               <div>
-                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="insert" value="INSERT"
-                  onClick={event => this.changeChosenDBEditType(event)}
+                <input style={{ marginLeft: "10px" }} type="radio" name="dbUpdateType" id="insert" value="insert"
+                  onClick={event => {this.changeChosenDBEditType(event); this.changeRouterURL(event)}}
                 />
                 <label style={{ marginLeft: "2px" }} htmlFor="insert">Insert</label>
               </div>
@@ -273,49 +371,61 @@ class EditDatabase extends React.Component {
 
             <p>Select the Relation you Would Like To Edit:</p>
             <select disabled={this.state.disableRelationChoice} id="selectedRelation" name="selectedRelation">
+              <option value="Default" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
+                -Select Relation-
+              </option>
 
-              <option value="Theater" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="Theater" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 Theater
               </option>
 
-              <option value="Movie" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="Movie" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 Movie
               </option>
 
-              <option value="SHOWING_IN" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="SHOWING_IN" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 Showing In
               </option>
 
-              <option value="Film_Worker" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="Film_Workers" onClick={event => this.changeRenderedRelationOption(event)}>
                 Film Worker
               </option>
 
-              <option value="WORKED_ON" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="WORKED_ON" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 Worked On
               </option>
 
-              <option value="Studio" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="Studio" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 Studio
               </option>
 
-              <option value="PRODUCED_BY" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="PRODUCED_BY" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 Produced By
               </option>
 
-              <option value="DB_User" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="DB_User" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 User
               </option>
 
-              <option value="Rating" onClick={event => this.changeRenderedRelationOption(event)}>
+              <option value="Rating" onClick={event => {this.changeRenderedRelationOption(event); this.changeRouterURL(event)}}>
                 Rating
               </option>
 
-            </select>
+            </select><br/>
             <div>
-              { this.state.filmWorkerChosen
-                ? this.renderFilmWorkerEdit()
+              <label>{`Show Existing Entries in the ${this.state.currChosenRelation} Relation?`}</label>
+              <input type="checkbox" checked={this.state.showRelationRows} style={{ marginLeft: "5px" }}
+                onChange={() => this.setState({ showRelationRows: !this.state.showRelationRows })}
+              />
+              { this.state.showRelationRows
+                ? <ShowRelationData currRelation={this.state.currChosenRelation} />
                 : null
               }
+            </div>
+            <p>Use the Fields Below to Alter the Database:</p>
+            <div>
+              { this.state.theaterChosen ? this.renderTheaterEdit() : null}
+              { this.state.filmWorkerChosen ? this.renderFilmWorkerEdit() : null}
             </div>
             <input type="submit" className="btn btn-primary mb-2" value="Submit Changes" style={{ marginTop: "5px" }} />
           </form>

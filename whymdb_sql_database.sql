@@ -41,7 +41,8 @@ CREATE TABLE Theater_Operating_Hours (
     Opening_Time TIME NOT NULL,
     Closing_Time TIME NOT NULL,
     
-    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location) ON DELETE CASCADE
+    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location)
+		ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Movie (
@@ -56,15 +57,18 @@ CREATE TABLE Movie_Genres (
 	Movie_ID INT NOT NULL,
     Genre VARCHAR(50) NOT NULL,
     
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID)
+		ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
 CREATE TABLE SHOWING_IN (
 	Theater_Location VARCHAR(300) NOT NULL,
     Movie_ID INT NOT NULL,
     
-    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location) ON DELETE CASCADE,
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE
+    FOREIGN KEY(Theater_Location) REFERENCES Theater(Location)
+		ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID)
+		ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
 CREATE TABLE Film_Workers (
@@ -79,22 +83,25 @@ CREATE TABLE Film_Workers (
 CREATE TABLE Actor_Actress (
 	ID INT NOT NULL,
     
-    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID) ON DELETE CASCADE
+    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID)
+		ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
 CREATE TABLE Director (
 	ID INT NOT NULL,
     
-    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID) ON DELETE CASCADE
+    FOREIGN KEY(ID) REFERENCES Film_Workers(Film_Worker_ID)
+		ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
 CREATE TABLE WORKED_ON (
 	Movie_ID INT NOT NULL,
     Film_Worker_ID INT NOT NULL,
     
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE,
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID)
+		ON DELETE CASCADE ON UPDATE RESTRICT,
     FOREIGN KEY(Film_Worker_ID) REFERENCES Film_Workers(Film_Worker_ID)
-		ON DELETE CASCADE
+		ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
 CREATE TABLE Studio (
@@ -107,8 +114,10 @@ CREATE TABLE PRODUCED_BY (
     Movie_ID INT NOT NULL,
     Studio_Name VARCHAR(25) NOT NULL,
     
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID),
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID)
+		ON DELETE CASCADE ON UPDATE RESTRICT,
     FOREIGN KEY(Studio_Name) REFERENCES Studio(Studio_Name)
+		ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE DB_User (
@@ -124,7 +133,8 @@ CREATE TABLE DB_User (
 CREATE TABLE Moderator (
 	Mod_Username VARCHAR(20),
     
-    FOREIGN KEY(Mod_Username) REFERENCES DB_User(Username) ON DELETE CASCADE
+    FOREIGN KEY(Mod_Username) REFERENCES DB_User(Username)
+		ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Rating (
@@ -136,14 +146,16 @@ CREATE TABLE Rating (
 	Title VARCHAR(50),
     Rating_Description VARCHAR(500),
     
-    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID) ON DELETE CASCADE,
-    FOREIGN KEY(Users_Username) REFERENCES DB_User(Username) ON DELETE CASCADE
+    FOREIGN KEY(Movie_ID) REFERENCES Movie(Movie_ID)
+		ON DELETE CASCADE ON UPDATE RESTRICT,
+    FOREIGN KEY(Users_Username) REFERENCES DB_User(Username)
+		ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Sample data to be inserted into each table of the schema.
 INSERT INTO Theater VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "B&B Theaters"),
-("1101 E. 18th St., Rolla, MO 65401", "Regal Forum");
+("1101 E. 18th St, Rolla, MO 65401", "Regal Forum");
 
 
 INSERT INTO Theater_Operating_Hours VALUES
@@ -155,13 +167,13 @@ INSERT INTO Theater_Operating_Hours VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "Sa", "10:30:00", "01:15:00"),
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", "Su", "10:30:00", "01:15:00"),
 
-("1101 E. 18th St., Rolla, MO 65401", "M", "11:00:00", "23:30:00"),
-("1101 E. 18th St., Rolla, MO 65401", "Tu", "11:00:00", "23:30:00"),
-("1101 E. 18th St., Rolla, MO 65401", "W", "11:00:00", "23:30:00"),
-("1101 E. 18th St., Rolla, MO 65401", "Th", "11:00:00", "23:30:00"),
-("1101 E. 18th St., Rolla, MO 65401", "F", "11:00:00", "23:30:00"),
-("1101 E. 18th St., Rolla, MO 65401", "Sa", "11:00:00", "23:30:00"),
-("1101 E. 18th St., Rolla, MO 65401", "Su", "11:00:00", "23:30:00");
+("1101 E. 18th St, Rolla, MO 65401", "M", "11:00:00", "23:30:00"),
+("1101 E. 18th St, Rolla, MO 65401", "Tu", "11:00:00", "23:30:00"),
+("1101 E. 18th St, Rolla, MO 65401", "W", "11:00:00", "23:30:00"),
+("1101 E. 18th St, Rolla, MO 65401", "Th", "11:00:00", "23:30:00"),
+("1101 E. 18th St, Rolla, MO 65401", "F", "11:00:00", "23:30:00"),
+("1101 E. 18th St, Rolla, MO 65401", "Sa", "11:00:00", "23:30:00"),
+("1101 E. 18th St, Rolla, MO 65401", "Su", "11:00:00", "23:30:00");
 
 INSERT INTO Movie(title, release_date) VALUES
 ("The Bad Guys", "2022-04-22"),
@@ -208,13 +220,13 @@ INSERT INTO SHOWING_IN VALUES
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 6),
 ("100 Wentzville Bluffs Dr, Wentzville, MO 63385", 7),
 
-("1101 E. 18th St., Rolla, MO 65401", 1),
-("1101 E. 18th St., Rolla, MO 65401", 2),
-("1101 E. 18th St., Rolla, MO 65401", 3),
-("1101 E. 18th St., Rolla, MO 65401", 4),
-("1101 E. 18th St., Rolla, MO 65401", 5),
-("1101 E. 18th St., Rolla, MO 65401", 6),
-("1101 E. 18th St., Rolla, MO 65401", 7);
+("1101 E. 18th St, Rolla, MO 65401", 1),
+("1101 E. 18th St, Rolla, MO 65401", 2),
+("1101 E. 18th St, Rolla, MO 65401", 3),
+("1101 E. 18th St, Rolla, MO 65401", 4),
+("1101 E. 18th St, Rolla, MO 65401", 5),
+("1101 E. 18th St, Rolla, MO 65401", 6),
+("1101 E. 18th St, Rolla, MO 65401", 7);
 
 INSERT INTO Film_Workers(First_Name, Last_Name) VALUES
 ("Pierre", "Perifel"),

@@ -95,7 +95,7 @@ function Account() {
               ? <div>
                   <p>Since You're a Moderator:</p>
                   { openEdit
-                    ? <EditDatabase username={currentUser[0].Logged_In_Username} mod={currentUser[0].Is_Moderator} />
+                    ? <EditDatabase />
                     : null
                   }
                   <button type="button" className="btn btn-primary mb-2" onClick={() => setEdit(!openEdit)}>

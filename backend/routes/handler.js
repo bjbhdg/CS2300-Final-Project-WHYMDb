@@ -300,25 +300,25 @@ router.post('/deleteAccount', async (req, res) => {
   res.end();
 });
 
-// This is a DEFAULT route that the edit function will be sent to. It does not actually do anything, it
-// is simply a placeholder to be replaced by the plethora of other connections below.
-router.post('/editDatabase', async (req, res) => {
-  console.log("Nothing was changed, make sure to fill out all fields.", req.body);
-  res.redirect("/account")
-  res.end();
-});
-
-// Below is an attempt to show the mods a query for each relation, may reimplement in the future.
-/*
+// Below is an array of 'get' functions that will retrieve the data currently inside each relation.
+// Only moderators will be able to access these.
 router.get('/getTheaterRows', async (req, res) => {
   pool.getConnection( (err, conn) => {
-    if (err) console.log;
+    if (err) console.log(err);
     try {
-      conn.query(`SELECT * FROM Movie AS M INNER JOIN Movie_Genres AS G ON M.Movie_ID = G.Movie_ID`, (err, result) => {
-        if (err) console.log(err);
-        res.send(JSON.stringify(result));
-        conn.release();
-      });
+      const getTheaterRows = `
+        SELECT T.Location, T.Theater_Owner, O.Day_Of_Operation, O.Opening_Time, O.Closing_Time
+        FROM Theater AS T
+        INNER JOIN Theater_Operating_Hours AS O
+          ON T.Location = O.Theater_Location
+        `;
+
+        conn.query(getTheaterRows, (err, result) => {
+          if (err) console.log(err);
+          res.send(JSON.stringify(result));
+          conn.release();
+        });
+
     } catch (err) {
       console.log(err);
       res.end();
@@ -327,10 +327,12 @@ router.get('/getTheaterRows', async (req, res) => {
 });
 
 router.get('/getMovieRows', async (req, res) => {
-    pool.getConnection( (err, conn) => {
-      if (err) console.log;
-      try {
-      conn.query(`SELECT * FROM Movie AS M INNER JOIN Movie_Genres AS G ON M.Movie_ID = G.Movie_ID`, (err, result) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    try {
+      const getMovieRows = `SELECT M.Movie_ID, M.Title, M.Release_Date, GROUP_CONCAT(G.Genre SEPARATOR ', ') AS Genre
+        FROM Movie AS M INNER JOIN Movie_Genres AS G ON M.Movie_ID = G.Movie_ID GROUP BY M.Movie_ID`;
+      conn.query(getMovieRows, (err, result) => {
         if (err) console.log(err);
         res.send(JSON.stringify(result));
         conn.release();
@@ -342,11 +344,251 @@ router.get('/getMovieRows', async (req, res) => {
   });
 });
 
-*/
+router.get('/getSHOWING_INRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    try {
+      const getShowingInRows = `SELECT M.Movie_ID, M.Title, S.Theater_Location
+        FROM SHOWING_IN AS S INNER JOIN Movie AS M, Theater AS T
+        WHERE M.Movie_ID = S.Movie_ID AND T.Location = S.Theater_Location`;
+
+      conn.query(getShowingInRows, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getFilm_WorkersRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    try {
+
+      const getFilmWorkerRows = `SELECT Film_Worker_ID, First_Name, Last_Name,
+        (Film_Worker_ID = A.ID) AS Is_Actor, (Film_Worker_ID = D.ID) AS Is_Director
+      FROM Film_Workers, Actor_Actress AS A, Director AS D
+      WHERE Film_Worker_ID = A.ID OR Film_Worker_ID = D.ID
+      GROUP BY Film_Worker_ID`;
+
+      conn.query(getFilmWorkerRows, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getWORKED_ONRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+    try {
+
+      const getWorkedOnRows = `SELECT W.Film_Worker_ID, F.First_Name, F.Last_Name, W.Movie_ID, M.Title
+        FROM WORKED_ON AS W, Film_Workers AS F, Movie AS M
+        WHERE W.Film_Worker_ID = F.Film_Worker_ID AND W.Movie_ID = M.Movie_ID`;
+
+      conn.query(getWorkedOnRows, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getStudioRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    try {
+      const getStudioRows = `SELECT Studio_Name FROM Studio`
+
+      conn.query(getStudioRows, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getPRODUCED_BYRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    try {
+      const getProducedByRows = `SELECT M.Movie_ID, M.Title, Studio_Name
+        FROM PRODUCED_BY AS P, Movie AS M WHERE P.Movie_ID = M.Movie_ID`;
+
+        conn.query(getProducedByRows, (err, result) => {
+          if (err) console.log(err);
+          res.send(JSON.stringify(result));
+          conn.release();
+        });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getDB_UserRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    try {
+      const getUserRows = `SELECT Username, User_Password, (Username = Mod_Username) AS Is_Moderator FROM DB_User, Moderator`;
+
+      conn.query(getUserRows, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
+
+router.get('/getRatingRows', async (req, res) => {
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    try {
+      const getRatingRows = `SELECT R.Movie_ID, M.Title AS Movie_Title, R.Users_Username,
+        R.Score, R.Date_Last_Updated, R.Title, R.Rating_Description
+      FROM Rating AS R, Movie AS M
+      WHERE R.Movie_ID = M.Movie_ID`;
+
+      conn.query(getRatingRows, (err, result) => {
+        if (err) console.log(err);
+        res.send(JSON.stringify(result));
+        conn.release();
+      });
+    } catch (err) {
+      console.log(err);
+      res.end();
+    }
+  });
+});
 
 // ================================
 // =====   EDIT CONNECTIONS   =====
 // ================================
+
+// This is the DEFAULT route that the edit function will be sent to. It does not actually do anything, it
+// is simply a placeholder to be replaced by the plethora of other connections below.
+router.post('/editDatabaseDefault', async (req, res) => {
+  console.log("Nothing was changed, make sure to fill out all fields.", req.body);
+  res.redirect("/account")
+  res.end();
+});
+
+router.post('/updateTheater', async(req, res) => {
+  console.log("Theat req", req.body);
+  const theatLoc = (req.body.theaterLocation !== "" ? req.body.theaterLocation : req.body.preExistTheater);
+  const existingTheater = req.body.preExistTheater;
+  const newOwner = req.body.newOwner;
+  const day = req.body.dayOfWeek;
+  const openTime = req.body.openingTime;
+  const closeTime = req.body.closingTime;
+
+  pool.getConnection( (err, conn) => {
+    if (req.body.opHourEditEnable === "on") {
+      
+
+      const theatOpHourEditQuery = `UPDATE Theater_Operating_Hours SET Opening_Time=?, Closing_Time=?
+        WHERE Theater_Location=? AND Day_Of_Operation=?`;
+
+      conn.query(theatOpHourEditQuery, [openTime, closeTime, existingTheater, day], (err, res) => {
+        conn.release();
+        if (err) console.log(err)
+        else console.log(`Operating Hours for ${existingTheater} on ${day} has been updated.`)
+      });
+    } else {
+      const editTheatInfo = `UPDATE Theater SET Location=?, Theater_Owner=? WHERE Location=?`;
+
+      conn.query(editTheatInfo, [theatLoc, newOwner, existingTheater], (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Theater Info for ${existingTheater} successfully updated.`);
+      });
+    }
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/deleteTheater', async(req, res) => {
+  const theatLoc = req.body.theaterLocation;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const deleteTheatQry = `DELETE FROM Theater WHERE Location=?`;
+
+    conn.query(deleteTheatQry, [theatLoc], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log(`Theater at ${theatLoc} successfully removed from the database.`)
+    });
+  });
+
+  res.redirect('/account');
+  res.end();
+});
+
+router.post('/insertTheater', async(req, res) => {
+  const newTheat = req.body.theaterLocation;
+  const owner = req.body.theaterOwner;
+
+  const preExistTheat = req.body.preExistingTheater;
+  const day = req.body.dayOfWeek;
+  const openTime = req.body.openingTime;
+  const closeTime = req.body.closingTime;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    if(req.body.opHourInsertEnable === "on") {
+      insertOpTimeQry = `INSERT INTO Theater_Operating_Hours VALUES(?, ?, ?, ?)`;
+
+      conn.query(insertOpTimeQry, [preExistTheat, day, openTime, closeTime], (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Operating Hours for ${preExistTheat} on ${day} has been added.`);
+      });
+    } else {
+      insertTheatQry = `INSERT INTO Theater VALUES(?, ?)`
+
+      conn.query(insertTheatQry, [newTheat, owner], (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Theater at ${newTheat} successfully added to the database.`);
+      });
+    }
+  });
+
+  res.redirect('/account');
+  res.end();
+});
 
 router.post('/updateActor_Actress', async(req, res) => {
   const idToUpdate = req.body.filmWorkerID;
@@ -358,20 +600,23 @@ router.post('/updateActor_Actress', async(req, res) => {
     if (err) console.log(err);
 
     if(updateToActorActress === "on") {
-      conn.query(`INSERT INTO Actor_Actress VALUES(${idToUpdate})`, (err, result) => {
-        conn.release();
+      const updateActTypeQry = `INSERT INTO Actor_Actress VALUES(?)`
+
+      conn.query(updateActTypeQry, [idToUpdate], (err, result) => {
         if (err) console.log(err);
         else console.log(`Film Worker ID #${idToUpdate} is now an Actor/Actress.`);
       });
     }
 
-    const updateActQry = `UPDATE Film_Workers SET First_Name=?, Last_Name=? WHERE Film_Worker_ID=?`;
+    if(newFName !== "" && newLName !== "") {
+      const updateActQry = `UPDATE Film_Workers SET First_Name=?, Last_Name=? WHERE Film_Worker_ID=?`;
 
-    conn.query(updateActQry, [newFName, newLName, idToUpdate], (err, result) => {
-      conn.release();
-      if (err) console.log(err);
-      else console.log(`Film Worker ID #${idToRemove} has been updated.`);
-    });
+      conn.query(updateActQry, [newFName, newLName, idToUpdate], (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToRemove} has been updated.`);
+      });
+    }
   });
 
   res.redirect("/account");
@@ -442,20 +687,24 @@ router.post('/updateDirector', async(req, res) => {
     if (err) console.log(err);
 
     if(updateToDirector === "on") {
-      conn.query(`INSERT INTO Director VALUES(${idToUpdate})`, (err, result) => {
+      const updateDirTypeQry = `INSERT INTO Director VALUES(?)`;
+
+      conn.query(updateDirTypeQry, [idToUpdate], (err, result) => {
         conn.release();
         if (err) console.log(err);
         else console.log(`Film Worker ID #${idToUpdate} is now a Director.`);
       });
     }
 
-    const updateDIRQry = `UPDATE Film_Workers SET First_Name=?, Last_Name=? WHERE Film_Worker_ID=?`;
+    if(newFName !== "" && newLName !== "") {
+      const updateDirQry = `UPDATE Film_Workers SET First_Name=?, Last_Name=? WHERE Film_Worker_ID=?`;
 
-    conn.query(updateDirQry, [newFName, newLName, idToUpdate], (err, result) => {
-      conn.release();
-      if (err) console.log(err);
-      else console.log(`Film Worker ID #${idToRemove} has been updated.`);
-    });
+      conn.query(updateDirQry, [newFName, newLName, idToUpdate], (err, result) => {
+        conn.release();
+        if (err) console.log(err);
+        else console.log(`Film Worker ID #${idToRemove} has been updated.`);
+      });
+    }
   });
 
   res.redirect("/account");
