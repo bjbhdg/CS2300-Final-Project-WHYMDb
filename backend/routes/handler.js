@@ -56,7 +56,8 @@ router.get('/search', async (req, res) => {
          
       WHERE Searched_Movie_Title = M.Title AND M.Movie_ID = G.Movie_ID
             AND M.Movie_ID = W.Movie_ID AND M.Movie_ID = R.Movie_ID AND
-            T.Location = S.Theater_Location AND M.Movie_ID = P.Movie_ID AND
+            T.Location = S.Theater_Location AND M.Movie_ID = S.Movie_ID
+            AND M.Movie_ID = P.Movie_ID AND
             (A.Movie_ID = M.Movie_ID) AND (D.Movie_ID = M.Movie_ID)
         
       GROUP BY M.Movie_ID
@@ -449,11 +450,17 @@ router.get('/getFilm_WorkersRows', async (req, res) => {
     if (err) console.log(err);
     try {
 
-      const getFilmWorkerRows = `SELECT Film_Worker_ID, First_Name, Last_Name,
-        (Film_Worker_ID = A.ID) AS Is_Actor, (Film_Worker_ID = D.ID) AS Is_Director
-      FROM Film_Workers, Actor_Actress AS A, Director AS D
-      WHERE Film_Worker_ID = A.ID OR Film_Worker_ID = D.ID
-      GROUP BY Film_Worker_ID`;
+      const getFilmWorkerRows = `
+      SELECT Film_Worker_ID, First_Name, Last_Name,
+        (Film_Worker_ID = A.ID) AS Is_Actor, (0) AS Is_Director
+      FROM Film_Workers, Actor_Actress AS A
+      WHERE Film_Worker_ID = A.ID
+      UNION ALL
+        (SELECT Film_Worker_ID, First_Name, Last_Name,
+          (0) AS Is_Actor, (Film_Worker_ID = D.ID) AS Is_Director
+        FROM Film_Workers, Director AS D
+        WHERE Film_Worker_ID = D.ID)
+      ORDER BY Film_Worker_ID ASC`;
 
       conn.query(getFilmWorkerRows, (err, result) => {
         if (err) console.log(err);

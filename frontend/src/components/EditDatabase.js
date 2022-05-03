@@ -209,19 +209,21 @@ class EditDatabase extends React.Component {
               <tbody>
                 <tr>
                   <td><label>Pre-Existing Location:</label></td>
-                  <td><input type="text" name="preExistTheater" placeholder="Theater Address" className="form-control" /></td>
+                  <td>
+                    <input type="text" name="preExistTheater" placeholder="Theater Address (Required)" className="form-control" />
+                  </td>
                 </tr>
                 <tr>
                   <td><label>Updated Location:</label></td>
                   <td>
-                    <input type="text" name="theaterLocation" placeholder="Updated Address (If Applicable)"
+                    <input type="text" name="theaterLocation" placeholder="Updated Address (Optional)"
                       className="form-control"
                     />
                   </td>
                 </tr>
                 <tr>
                   <td><label>Updated Owner:</label></td>
-                  <td><input type="text" name="newOwner" placeholder="Owner" className="form-control" /></td>
+                  <td><input type="text" name="newOwner" placeholder="Owner (Optional)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Just Editing Operating Hours?</label></td>
@@ -254,7 +256,9 @@ class EditDatabase extends React.Component {
             ? <tbody>
                 <tr>
                   <td><label>Location:</label></td>
-                  <td><input type="text" name="theaterLocation" placeholder="Theater Address" className="form-control" /></td>
+                  <td>
+                    <input type="text" name="theaterLocation" placeholder="Theater Address (Required)" className="form-control" />
+                  </td>
                 </tr>
               </tbody>
             : this.state.insertDBChosen
@@ -262,14 +266,16 @@ class EditDatabase extends React.Component {
                   <tbody>
                     <tr>
                       <td><label>Location:</label></td>
-                      <td><input type="text" name="theaterLocation" placeholder="Theater Address" className="form-control" /></td>
+                      <td>
+                        <input type="text" name="theaterLocation" placeholder="Theater Address (Required)" className="form-control" />
+                      </td>
                     </tr>
                     <tr>
                       <td><label>Owner:</label></td>
-                      <td><input type="text" name="theaterOwner" placeholder="Owner" className="form-control" /></td>
+                      <td><input type="text" name="theaterOwner" placeholder="Owner (Required)" className="form-control" /></td>
                     </tr>
                     <tr>
-                      <td><label>Just Insert Operating Hours?</label></td>
+                      <td><label>Just Inserting Operating Hours?</label></td>
                       <td>
                       <input id="opHourEditEnable" type="checkbox" name="opHourInsertEnable"
                         onChange={() => this.setState({ toggleOpHourEdit: !this.state.toggleOpHourEdit })}
@@ -282,7 +288,9 @@ class EditDatabase extends React.Component {
                         <tr>
                           <td><label>Pre-Existing Theater:</label></td>
                           <td>
-                            <input type="text" name="preExistingTheater" placeholder="Theater Address" className="form-control" />
+                            <input type="text" name="preExistingTheater" placeholder="Theater Address (Required)"
+                              className="form-control"
+                            />
                           </td>
                         </tr>
                         <tr>
@@ -316,12 +324,12 @@ class EditDatabase extends React.Component {
               <tbody>
                 <tr>
                   <td><label>Existing Movie ID:</label></td>
-                  <td><input type="number" name="preExistID" placeholder="Film ID" className="form-control" /></td>
+                  <td><input type="number" name="preExistID" placeholder="Film ID (Required)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>New Title:</label></td>
                   <td>
-                    <input type="text" name="newTitle" placeholder="New Title (If Applicable)"
+                    <input type="text" name="newTitle" placeholder="New Title (Optional)"
                       className="form-control"
                     />
                   </td>
@@ -350,7 +358,7 @@ class EditDatabase extends React.Component {
                   <tbody>
                     <tr>
                       <td><label>Movie Title:</label></td>
-                      <td><input type="text" name="titleToAdd" placeholder="Title" className="form-control" /></td>
+                      <td><input type="text" name="titleToAdd" placeholder="Title (Required)" className="form-control" /></td>
                     </tr>
                     <tr>
                       <td><label>Release Date:</label></td>
@@ -369,7 +377,11 @@ class EditDatabase extends React.Component {
                     ? <tbody>
                         <tr>
                           <td><label>Pre-Existing ID:</label></td>
-                          <td><input type="text" name="preExistingMovieID" placeholder="Movie ID" className="form-control" /></td>
+                          <td>
+                            <input type="text" name="preExistingMovieID" placeholder="Movie ID (Required)"
+                              className="form-control"
+                            />
+                          </td>
                         </tr>
                         <tr>
                           <td><label>Genres:</label></td>
@@ -416,15 +428,17 @@ class EditDatabase extends React.Component {
               <tbody>
                 <tr>
                   <td><label>Film Maker ID:</label></td>
-                  <td><input type="number" name="filmWorkerID" placeholder="Actor/Director ID" className="form-control" /></td>
+                  <td>
+                    <input type="number" name="filmWorkerID" placeholder="Actor/Director ID (Required)" className="form-control" />
+                  </td>
                 </tr>
                 <tr>
                   <td><label>Updated First Name:</label></td>
-                  <td><input type="text" name="newFirstName" placeholder="First Name (Not Needed)" className="form-control" /></td>
+                  <td><input type="text" name="newFirstName" placeholder="First Name (Optional)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Updated Last Name:</label></td>
-                  <td><input type="text" name="newLastName" placeholder="Last Name (Not Needed)" className="form-control" /></td>
+                  <td><input type="text" name="newLastName" placeholder="Last Name (Optional)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Make Specified Film Worker Type?</label></td>
@@ -450,11 +464,11 @@ class EditDatabase extends React.Component {
                   <tbody>
                     <tr>
                       <td><label>First Name:</label></td>
-                      <td><input type="text" name="firstName" placeholder="First Name" className="form-control" /></td>
+                      <td><input type="text" name="firstName" placeholder="First Name (Required)" className="form-control" /></td>
                     </tr>
                     <tr>
                       <td><label>Last Name:</label></td>
-                      <td><input type="text" name="lastName" placeholder="Last Name" className="form-control" /></td>
+                      <td><input type="text" name="lastName" placeholder="Last Name (Required)" className="form-control" /></td>
                     </tr>
                   </tbody>
                 </table>
@@ -480,11 +494,11 @@ class EditDatabase extends React.Component {
                 </tr>
                 <tr>
                   <td><label>Updated Movie ID:</label></td>
-                  <td><input type="number" name="newMovieID" placeholder="Movie ID" className="form-control" /></td>
+                  <td><input type="number" name="newMovieID" placeholder="Movie ID (Optional)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Updated Theater Location:</label></td>
-                  <td><input type="text" name="newTheaterLocation" placeholder="Address" className="form-control" /></td>
+                  <td><input type="text" name="newTheaterLocation" placeholder="Address (Optional)" className="form-control" /></td>
                 </tr>
               </tbody>
             </table>
@@ -536,11 +550,11 @@ class EditDatabase extends React.Component {
                 </tr>
                 <tr>
                   <td><label>Updated Movie ID:</label></td>
-                  <td><input type="number" name="newMovieID" placeholder="Movie ID" className="form-control" /></td>
+                  <td><input type="number" name="newMovieID" placeholder="Movie ID (Optional)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Updated Film Worker ID:</label></td>
-                  <td><input type="text" name="newFWorker" placeholder="Film Worker ID" className="form-control" /></td>
+                  <td><input type="text" name="newFWorker" placeholder="Film Worker ID (Optional)" className="form-control" /></td>
                 </tr>
               </tbody>
             </table>
@@ -583,7 +597,7 @@ class EditDatabase extends React.Component {
           ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
               <tr>
                 <td><label>Pre-Existing Studio</label></td>
-                <td><input type="text" name="origStudio" placeholder="Name" className="form-control" /></td>
+                <td><input type="text" name="origStudio" placeholder="Name (Required)" className="form-control" /></td>
               </tr>
               <tr>
                 <td><label>New Studio:</label></td>
@@ -594,14 +608,14 @@ class EditDatabase extends React.Component {
             ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
                 <tr>
                   <td><label>Studio:</label></td>
-                  <td><input type="text" name="studioToDelete" placeholder="Name" className="form-control" /></td>
+                  <td><input type="text" name="studioToDelete" placeholder="Name (Required)" className="form-control" /></td>
                 </tr>
               </table>
             : this.state.insertDBChosen
               ? <table style={{ marginLeft: "auto", marginRight: "auto", width: "auto" }}>
                   <tr>
                     <td><label>Studio:</label></td>
-                    <td><input type="text" name="studioToAdd" placeholder="Name" className="form-control" /></td>
+                    <td><input type="text" name="studioToAdd" placeholder="Name (Required)" className="form-control" /></td>
                   </tr>
                 </table>
               : null
@@ -626,11 +640,11 @@ class EditDatabase extends React.Component {
                 </tr>
                 <tr>
                   <td><label>Updated Studio:</label></td>
-                  <td><input type="text" name="newStudio" placeholder="Name" className="form-control" /></td>
+                  <td><input type="text" name="newStudio" placeholder="Name (Optional)" className="form-control" /></td>
                 </tr>
                 <tr>
                   <td><label>Updated Film Worker ID:</label></td>
-                  <td><input type="text" name="newMovie" placeholder="Movie ID" className="form-control" /></td>
+                  <td><input type="text" name="newMovie" placeholder="Movie ID (Optional)" className="form-control" /></td>
                 </tr>
               </tbody>
             </table>
@@ -704,11 +718,11 @@ class EditDatabase extends React.Component {
               ? <tbody>
                   <tr>
                     <td><label>Username:</label></td>
-                    <td><input type="text" name="usernameToAdd" placeholder="Name" className="form-control" /></td>
+                    <td><input type="text" name="usernameToAdd" placeholder="Name (Required)" className="form-control" /></td>
                   </tr>
                   <tr>
                     <td><label>Password:</label></td>
-                    <td><input type="text" name="passwordToAdd" placeholder="Password" className="form-control" /></td>
+                    <td><input type="text" name="passwordToAdd" placeholder="Password (Required)" className="form-control" /></td>
                   </tr>
                   <tr>
                     <td><label>Is Moderator?</label></td>
@@ -749,15 +763,19 @@ class EditDatabase extends React.Component {
               </tr>
               <tr>
                 <td><label>Updated Score:</label></td>
-                <td><input type="number" name="updatedScore" placeholder="Out of 10" min={0} max={10} className="form-control" /></td>
+                <td>
+                  <input type="number" name="updatedScore" placeholder="Out of 10 (Required)" min={0} max={10}
+                    className="form-control"
+                  />
+                </td>
               </tr>
               <tr>
                 <td><label>Updated Rating Title:</label></td>
-                <td><input type="text" name="updatedTitle" placeholder="Rating Title" className="form-control" /></td>
+                <td><input type="text" name="updatedTitle" placeholder="Rating Title (Optional)" className="form-control" /></td>
               </tr>
               <tr>
                 <td><label>Updated Rating Description:</label></td>
-                <td><input type="text" name="updatedDescription" placeholder="Description" className="form-control" /></td>
+                <td><input type="text" name="updatedDescription" placeholder="Description (Optional)" className="form-control" /></td>
               </tr>
             </tbody>
           : this.state.deleteDBChosen
