@@ -932,6 +932,7 @@ class EditDatabase extends React.Component {
               <Link to="/account" className="btn btn-primary mb-2">Return to Account</Link>
             </div>
           </div>
+          // If you are not a moderator, then you should not be on this page...
          : <p>{"You're not supposed to be here >:("}</p>
       }
       </div>

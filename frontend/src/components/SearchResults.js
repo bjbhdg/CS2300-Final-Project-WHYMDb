@@ -102,7 +102,7 @@ class SearchResults extends React.Component {
   // row of the search results table.
   theaterPopUp(movie) {
     // Theater data grabbed from the database is structure like this:
-    // Location | Owner | Day | Open Time | Close Time || (New Day Data) ... ||| (New theater location data)
+    // Location | Owner | Day | Open Time | Close Time || (New Day Data) ... ||| (New theater location data) ...
 
     // This separates all movie theater location data into an array.
     const theaters = movie.Theaters.split(' ||| ')
@@ -111,27 +111,28 @@ class SearchResults extends React.Component {
       <div className={styles.popupBox}>
         <div className={styles.box}>
         <h2 className="mt-3">Theater Locations Showing "{movie.Title}":</h2>
-        { theaters.map((theater) =>
+        { // Maps out each theater location the movie is showing in.
+          theaters.map((theater) =>
           <table key={theater.split(' || ')[0].split(' | ')[0]}
             style={{ marginLeft: "auto", marginRight: "auto", width: "inherit" , marginBottom: "25px",  tableLayout: "fixed" }}
           >
             <tbody>
+              {/* Location Row */}
               <tr style={{ border: "1px solid black" }}>
                 <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Location:</label></td>
-                <td>{theater.split(' || ')[0].split(' | ')[0]}</td>
+                <td colSpan={2}>{theater.split(' || ')[0].split(' | ')[0]}</td>
               </tr>
+              {/* Owner Row */}
               <tr style={{ border: "1px solid black" }}>
                 <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Owner:</label></td>
-                <td>{theater.split(' || ')[0].split(' | ')[1]}</td>
+                <td colSpan={2}>{theater.split(' || ')[0].split(' | ')[1]}</td>
               </tr>
               {/* Empty space to separate the theater location/owner with its operating hours. */}
               <tr style={{ border: "1px solid black" }}>
                 <td></td>
               </tr>
               <tr style={{ border: "1px solid black" }}>
-                <td></td>
-                <td><label style={{ fontWeight: "bold" }}>Operating Hours:</label></td>
-                <td></td>
+                <td colSpan={3}><label style={{ fontWeight: "bold" }}>Operating Hours:</label></td>
               </tr>
               <tr style={{ border: "1px solid black" }}>
                 <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Day of Week:</label></td>
@@ -169,28 +170,34 @@ class SearchResults extends React.Component {
       <div className={styles.popupBox}>
         <div className={styles.box}>
           <h2 className="mt-3">User Ratings For "{movie.Title}":</h2>
-          { ratings.map((rating) =>
+          { // We will be mapping out a table for each rating of the passed in movie.
+            ratings.map((rating) =>
             <table key={rating.split(', ')[0]}
               style={{ border: "1px solid black", marginLeft: "auto", marginRight: "auto", width: "inherit" ,
                 marginBottom: "20px",  tableLayout: "fixed" }}
             >
               <tbody>
+                {/* Username Row */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Rating User:</label></td>
                   <td style={{ border: "1px solid black" }}>{rating.split(', ')[0]}</td>
                 </tr>
+                {/* Score Row */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Score:</label></td>
                   <td style={{ border: "1px solid black" }}>{rating.split(', ')[1]}</td>
                 </tr>
+                {/* Date Updated Row */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Date Last Updated:</label></td>
                   <td style={{ border: "1px solid black" }}>{new Date(rating.split(', ')[2]).toISOString().split('T')[0]}</td>
                 </tr>
+                {/* Rating's Title */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Rating Title:</label></td>
                   <td style={{ border: "1px solid black" }}>{rating.split(', ')[3]}</td>
                 </tr>
+                {/* Rating's Description */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Rating Description:</label></td>
                   <td style={{ border: "1px solid black" }}>{rating.split(', ')[4]}</td>
@@ -227,6 +234,8 @@ class SearchResults extends React.Component {
                 <tr>
                   <td><label>Movie ID:</label></td>
                   <td>
+                    {/* The currently selected movie's id is forcibly placed here, since the user will only add
+                      * a rating to the movie they are currently on.*/}
                     <input type="text" value={this.state.currentMovie.Movie_ID} readOnly={true} className="form-control"
                       name="theMovieID"
                     />
@@ -235,6 +244,8 @@ class SearchResults extends React.Component {
                 <tr>
                   <td><label>Your Username:</label></td>
                   <td>
+                    {/* Due to Rating requiring the author of the rating to be used to create a new Rating tuple,
+                      * we forcibly place the currently logged in username as an unchangeable field. */}
                     <input type="text" value={this.state.userLoggedInInfo[0].Logged_In_Username} readOnly={true}
                       className="form-control" name="myUsername"
                     />
@@ -278,13 +289,17 @@ class SearchResults extends React.Component {
     
         <h1 className="mt-5">WHYMDb</h1>
         <h2 className="mt-3">
-          { this.state.currentMovie.length !== 0
+          { // If a user's search yields results, then we will print out the current movie selected out
+            // of all search results. If the search was unsuccessful, then just print "Search Results:".
+            this.state.currentMovie.length !== 0
             ? `Search Result ${this.state.currentMovie.Search_ID} of ${this.state.searchResultsData.length}:`
             : `Search Results:`
           }
         </h2>
         
-        { this.state.currentMovie.length !== 0
+        { // These buttons allow the user to cycle through multiple search results, do not render them if no results were found
+          // from the search or if there was only one movie found.
+          this.state.searchResultsData.length > 1
           ? <div id={this.state.currentMovie.Movie_ID}
               style={{ marginLeft: "auto", marginRight: "auto", justifyContent: "space-evenly", marginBottom: "10px" }}
             >
@@ -303,6 +318,7 @@ class SearchResults extends React.Component {
           : null
         }
 
+        {/* The popups are stored here, and open up depending on whether or not the user presses certain buttons, etc. */}
         { this.state.showRatings ? this.ratingPopUp(this.state.currentMovie) : null }
         { this.state.showTheaterInfo ? this.theaterPopUp(this.state.currentMovie) : null }
         { this.state.showRatingInsert ? this.addRatingPopUp() : null }
@@ -315,16 +331,26 @@ class SearchResults extends React.Component {
               width: "35%", marginBottom: "30px",  tableLayout: "auto" }}
             >
               <tbody>
+                {/* Movie's Title */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Title:</label></td>
                   <td style={{ border: "1px solid black" }}>{this.state.currentMovie.Title}</td>
                 </tr>
+                {/* Movie's Release Date */}
+                <tr style={{ border: "1px solid black" }}>
+                  <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Release Date:</label></td>
+                  <td style={{ border: "1px solid black" }}>
+                    {new Date(this.state.currentMovie.Release_Date).toISOString().split('T')[0]}
+                  </td>
+                </tr>
+                {/* Movie's Genre(s) */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}>
                     <label>{`Genre${this.state.currentMovie.Genres.split(', ').length === 1 ? "" : "s"}:`}</label>
                   </td>
                   <td style={{ border: "1px solid black" }}><label>{this.state.currentMovie.Genres}</label></td>
                 </tr>
+                {/* Movie's Average Rating (along with a button to show a more detailed view of the ratings) */}
                 <tr style={{ border: "1px solid black" }}>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Average Rating:</label></td>
                   <td style={{ border: "1px solid black" }}>
@@ -336,6 +362,7 @@ class SearchResults extends React.Component {
                     </button>
                   </td>
                 </tr>
+                {/* Movie's Director(s) */}
                 <tr>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}>
                     <label>{`Director${this.state.currentMovie.Directors.split(', ').length === 1 ? "" : "s"}:`}</label>
@@ -344,18 +371,21 @@ class SearchResults extends React.Component {
                     <label>{this.state.currentMovie.Directors}</label>
                   </td>
                 </tr>
+                {/* Movie's Actors/Actresses */}
                 <tr>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}>
                     <label>{`Actor${this.state.currentMovie.Actors.split(', ').length === 1 ? "" : "s"}:`}</label>
                   </td>
                   <td style={{ border: "1px solid black" }}><label>{this.state.currentMovie.Actors}</label></td>
                 </tr>
+                {/* Movie's Studio(s) */}
                 <tr>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}>
                     <label>{`Studio${this.state.currentMovie.Studios.split(', ').length === 1 ? "" : "s"}:`}</label>
                   </td>
                   <td style={{ border: "1px solid black" }}><label>{this.state.currentMovie.Studios}</label></td>
                 </tr>
+                {/* Theaters Showing the Movie (with another button to show detailed Theater information) */}
                 <tr>
                   <td style={{ border: "1px solid black", fontWeight: "bold" }}><label>Showing In:</label></td>
                   <td style={{ border: "1px solid black" }}>

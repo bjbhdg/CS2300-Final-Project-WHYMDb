@@ -34,6 +34,7 @@ function Account() {
       { // If the user has not logged in yet, render this.
         !currentUser.length
         ? <div>
+            {/* Login Form */}
             <h2 className='mt-3'>Please Log In To Your Account</h2>
             <form method="POST" action="/login">
               <table className="mt-3" style={{ marginLeft: "auto", marginRight: "auto", width: "30%" }}>
@@ -64,6 +65,7 @@ function Account() {
               Ensure Your Password is Between 8 to 25 Characters Long and Your Username is Within 20 Characters in Length Too.
             </p>
 
+            {/* Create Account Form */}
             <form method="POST" action="/createAccount">
               <table className="mt-3" style={{ marginLeft: "auto", marginRight: "auto", width: "30%" }}>
                 <tbody>
@@ -103,22 +105,25 @@ function Account() {
                 </div>
               : null
             }
+            {/* Greeting at the top of a user's account page. */}
             <h2 className='mt-3'>
               {`Welcome "${currentUser[0].Logged_In_Username}"!`}
             </h2>
             <div>
               <p>Your Movie Ratings:</p>
-              {/* Update in the future, make it look prettier. */}
+              {/* Prints out a small table showcasing all of the logged in user's movie ratings. */}
               {userRatings.map(rating => (
                 <table key={rating.Rated_Movie}
                   style={{ border: "1px solid black", marginLeft: "auto", marginRight: "auto",
                     width: "25%", marginBottom: "5px" }}
                 >
                   <tbody>
+                    {/* Title of Rating */}
                     <tr style={{ border: "1px solid black" }}>
                       <td style={{ border: "1px solid black", width: "35%" }}>Title:</td>
                       <td style={{ border: "1px solid black" }}>{rating.Rated_Movie}</td>
                     </tr>
+                    {/* Score the logged in user gave the movie. */}
                     <tr style={{ border: "1px solid black" }}>
                       <td style={{ border: "1px solid black", width: "35%" }}>Your Score:</td>
                       <td style={{ border: "1px solid black" }}>{rating.Score}/10</td>
@@ -141,7 +146,7 @@ function Account() {
                       Delete Account
                     </button>
                 }
-                { // A "Yes" and "No" button is rendered when a user attempts to delete their account, to ensurer that
+                { // A "Yes" and "No" button is rendered when a user attempts to delete their account, to ensure that
                   // the user wants to follow through with this action.
                   confirmDelete 
                   ? <div>
