@@ -6,7 +6,7 @@
 
 ## Step 2: Editing `backend`:
 ### Run `npm install`.
-### Similar to Step 1, we will now run `npm install mysql` in the `backend` folder.
+### Now, we will run `npm install mysql express webpack concurrently body-parser` in the `backend` folder to install all of the necessary files.
 ### Open the `whymdb_sql_database.sql` script in MySQL and perform the necessary edits. Then, run the script in the shell/workbench.
 ### In the `.env` file, fill in the empty `DB_` variables with your own MySQL Connection information on your device.
 ### 
