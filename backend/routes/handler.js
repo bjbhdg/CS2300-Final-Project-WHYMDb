@@ -8,9 +8,60 @@ router.get('/search', async (req, res) => {
   // Establish connection to the MySQL database.
   pool.getConnection( (err, conn) => {
     if (err) console.log(err);
+
+    // Due to the nature of searching our database, some queries will have a large
+    // amount of data to be transferred, so we must increase the max limit size
+    // (specifically for retrieving theater information and user ratings for outputting).
+    conn.query(`SET @@group_concat_max_len = 1048576`, (err, result) => {
+      if (err) console.log(err);
+      else console.log("Group Concat size limit increased.");
+    });
+
     try {
       // Query the database for the movie titles of the searched movie results.
-      const grabSearchResults = `SELECT Searched_Movie_Title FROM Search_Results`
+      const grabSearchResults = `
+      SELECT Res.Search_ID, M.Movie_ID, M.Title, M.Release_Date,
+        group_concat(DISTINCT G.Genre SEPARATOR ', ') AS Genres,
+        group_concat(DISTINCT P.Studio_Name SEPARATOR ', ') AS Studios,
+        group_concat(DISTINCT A.Actors SEPARATOR ', ') AS Actors,
+        group_concat(DISTINCT D.Directors SEPARATOR ', ') AS Directors,
+        group_concat(DISTINCT R.Rating SEPARATOR ' | ') AS Ratings,
+        group_concat(DISTINCT T.Theater_Times SEPARATOR ' ||| ') AS Theaters
+        
+      FROM (SELECT W.Movie_ID, CONCAT(First_Name, ' ', Last_Name) AS Actors
+            FROM Film_Workers AS F, Actor_Actress, Movie AS M, WORKED_ON AS W
+            WHERE F.Film_Worker_ID = ID AND M.Movie_ID = W.Movie_ID AND W.Film_Worker_ID = ID
+            ORDER BY W.Movie_ID ASC) AS A,
+         
+           (SELECT W.Movie_ID, CONCAT(First_Name, ' ', Last_Name) AS Directors
+            FROM Film_Workers AS F, Director, Movie AS M, WORKED_ON AS W
+            WHERE F.Film_Worker_ID = ID AND M.Movie_ID = W.Movie_ID AND W.Film_Worker_ID = ID
+            ORDER BY W.Movie_ID ASC) AS D,
+         
+           (SELECT R2.Movie_ID,
+            CONCAT(R2.Users_Username, ', ', R2.Score, ', ', R2.Date_Last_Updated, ', ',
+            COALESCE(R2.Title, "[No Title Provided]"), ', ',
+            COALESCE(R2.Rating_Description, "[No Description Provided]")) AS Rating
+            FROM Rating AS R2, Movie AS M2
+            WHERE R2.Movie_ID = M2.Movie_ID) AS R,
+         
+           (SELECT Location, Theater_Owner, GROUP_CONCAT(
+           (CONCAT(O.Theater_Location, ' | ', Theater_Owner, ' | ', O.Day_Of_Operation, ' | ',
+            O.Opening_Time, ' | ', O.Closing_Time)) SEPARATOR ' || ') AS Theater_Times
+            FROM Theater, Theater_Operating_Hours AS O
+            WHERE Location = O.Theater_Location GROUP BY Location) AS T,
+         
+            Search_Results AS Res, Movie AS M, Movie_Genres AS G,
+            WORKED_ON AS W, SHOWING_IN AS S, PRODUCED_BY AS P
+         
+      WHERE Searched_Movie_Title = M.Title AND M.Movie_ID = G.Movie_ID
+            AND M.Movie_ID = W.Movie_ID AND M.Movie_ID = R.Movie_ID AND
+            T.Location = S.Theater_Location AND M.Movie_ID = P.Movie_ID AND
+            (A.Movie_ID = M.Movie_ID) AND (D.Movie_ID = M.Movie_ID)
+        
+      GROUP BY M.Movie_ID
+      ORDER BY Res.Search_ID ASC`;
+
       conn.query(grabSearchResults, (err, result) => {
         if (err) console.log(err)
         // Send that data to SearchResults.js page for further processing.
@@ -116,9 +167,7 @@ router.post('/searchSubmitted', async (req, res) => {
 
     conn.query(searchForMovies,
         [movieTitle, dateRangeStart, dateRangeEnd, aFirstName, aLastName,
-          dFirstName, dLastName, stuName, theatLoc, minRate, maxRate, [genres]
-        ],
-          (err, result) => {
+          dFirstName, dLastName, stuName, theatLoc, minRate, maxRate, [genres]], (err, result) => {
       conn.release();
       if (err) console.log(err);
       else console.log('Search Processed Successfully!!!');
@@ -128,6 +177,32 @@ router.post('/searchSubmitted', async (req, res) => {
     res.redirect('/search');
     res.end();
   });
+});
+
+// This processes the user information entered when adding a rating via the '/search' page.
+router.post('/addMovieRating', async (req, res) => {
+  const movieID = req.body.theMovieID;
+  const username = req.body.myUsername;
+  const score = req.body.myRating;
+  const title = req.body.myTitle;
+  const descript = req.body.myDescription;
+
+  pool.getConnection( (err, conn) => {
+    if (err) console.log(err);
+
+    const userRatingInsertQry = `INSERT INTO
+      Rating(Movie_ID, Users_Username, Score, Title, Rating_Description) 
+      VALUES(?, ?, ?, ?, ?)`;
+
+    conn.query(userRatingInsertQry, [movieID, username, score, title, descript], (err, result) => {
+      conn.release();
+      if (err) console.log(err);
+      else console.log("User rating successfully added.");
+    });
+  });
+
+  res.redirect('/search');
+  res.end();
 });
 
 // When on the Account page after clicking the link on the navigation bar, the page will
@@ -805,7 +880,7 @@ router.post('/updateActor_Actress', async (req, res) => {
       conn.query(updateActQry, [newFName, newLName, idToUpdate], (err, result) => {
         conn.release();
         if (err) console.log(err);
-        else console.log(`Film Worker ID #${idToRemove} has been updated.`);
+        else console.log(`Film Worker ID #${idToUpdate} has been updated.`);
       });
     }
   });
@@ -897,7 +972,7 @@ router.post('/updateDirector', async (req, res) => {
       conn.query(updateDirQry, [newFName, newLName, idToUpdate], (err, result) => {
         conn.release();
         if (err) console.log(err);
-        else console.log(`Film Worker ID #${idToRemove} has been updated.`);
+        else console.log(`Film Worker ID #${idToUpdate} has been updated.`);
       });
     }
   });
