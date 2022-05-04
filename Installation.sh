@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script was written in VSCode using the GIT Bash terminal.
+# This script was written in VSCode using the Git Bash terminal.
 
 # Installations made to root.
 npm install mysql;
@@ -14,6 +14,9 @@ cd backend;
 # Relevant packages are installed in the frontend folder.
 cd ../frontend;
   npm install;
+
+  # This command may not be necessary, so if it fails here, you should be good to go executing
+  # 'npm run dev' in the backend folder.
   export NODE_OPTIONS=--openssl-legacy-provider;
 
 # "npm run dev" will run both the server and the frontend concurrently (thanks to a script in package.json in the backend),

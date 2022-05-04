@@ -1,5 +1,8 @@
 # CS2300-Final-Project-WHYMDb
 
+# Note:
+## You will need to have `node.js` and `npm` installed on your device in order to install this application correctly.
+
 # Installation Process:
 ## Step 1: Install MySQL
 ### Run `npm install mysql` in the root directory in a terminal, followed by `npm link --force mysql`.

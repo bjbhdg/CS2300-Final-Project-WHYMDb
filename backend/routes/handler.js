@@ -220,7 +220,7 @@ pool.getConnection( (err, conn) => {
     CREATE TABLE IF NOT EXISTS User_Logged_In (
       Logged_In_Username VARCHAR(20) NOT NULL,
       Is_Moderator BOOLEAN,
-      FOREIGN KEY(Logged_In_Username) REFERENCES DB_User(Username) ON DELETE CASCADE
+      FOREIGN KEY(Logged_In_Username) REFERENCES DB_User(Username) ON DELETE CASCADE ON UPDATE CASCADE
   )`;
 
   conn.query(CREATE_USER_LOGGED_IN, (err, result) => {
